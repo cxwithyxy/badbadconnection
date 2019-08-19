@@ -1,14 +1,17 @@
 import { BrowserWindow, webContents, ipcMain } from "electron";
 
-export class Browser
+export class Badbadconnection
 {
 
     url = "http://www.goeasy.io/cn/demo/qrcodelogin"
     win: BrowserWindow
     wincc: webContents
+    on_resv_func: (msg: string) => void
+    channel: string
 
-    constructor()
+    constructor(channel: string)
     {
+        this.channel = channel
         this.win = new BrowserWindow({
             width: 400,
             height: 200,
@@ -17,25 +20,31 @@ export class Browser
             }
         })
         this.wincc = this.win.webContents
+        this.on_resv_func = (msg: string) => {}
     }
 
     async init()
     {
         await this.win.loadURL(this.url)
 
-        await this.wincc.executeJavaScript(`let main_app = new Main_app("demo_channel2")`)
+        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.channel}")`)
 
         ipcMain.on("main_app_recv", (e, msg) =>
         {
-            console.log(msg);
-            
+            this.on_resv_func(msg);
         })
-
-        this.wincc.send("main_app_send", "do do do do do")
 
         return this
     }
 
+    send(msg: string)
+    {
+        this.wincc.send("main_app_send", msg)
+    }
 
+    on_recv(_func: (msg: string) => void)
+    {
+        this.on_resv_func = _func
+    }
 
 }
