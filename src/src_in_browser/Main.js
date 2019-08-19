@@ -22,7 +22,6 @@ class Main_app {
         this.get_goeasy().subscribe({
             channel: this.channel,
             onMessage: (message) => {
-                console.log('收到：' + message.content);
                 electron_1.ipcRenderer.send("main_app_recv", message.content);
             }
         });

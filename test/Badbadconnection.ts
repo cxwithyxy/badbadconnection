@@ -11,16 +11,14 @@ describe("Badbadconnection", function ()
     let test_msg = `test_msg${Math.round(Math.random() * 1e6)}`
     let browser: BrowserWindow
 
-    function test_send()
+    async function test_send()
     {
-        browser.webContents.executeJavaScript(`
+        await browser.webContents.executeJavaScript(`
             goeasy.publish({
                 channel:"${channel}",
                 message:"${test_msg}"
             })
         `)
-        console.log(212);
-        
     }
 
     beforeEach(async () =>
@@ -35,7 +33,6 @@ describe("Badbadconnection", function ()
 
     describe("#on_recv", async () =>
     {
-
         it("是否能接受到信息", async () =>
         {
             await new Promise((succ) =>
@@ -48,6 +45,26 @@ describe("Badbadconnection", function ()
                 test_send()
             })
         })
-        
+    })
+
+    describe("#send", async () =>
+    {
+        it("能否发送信息", async () =>
+        {
+            await browser.webContents.executeJavaScript(`
+                test_recv = "test"
+                goeasy.subscribe({
+                    channel:'${channel}',
+                    onMessage: function(message)
+                    {
+                        test_recv = message.content
+                    }
+                });
+            `)
+            badbadconnection.send(test_msg)
+            await sleep(3e3)
+            let test_recv = await browser.webContents.executeJavaScript(`"" + test_recv`)
+            should(test_recv).equal(test_msg)
+        })
     })
 })
