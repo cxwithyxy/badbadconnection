@@ -6,10 +6,8 @@ class Main_app
 
     constructor(channel: string)
     {
-        console.log("Main_app inject successfully")
         this.channel = channel
         this.ipc_init()
-        this.send("Main_app inject successfully")
     }
 
     get_goeasy(): any

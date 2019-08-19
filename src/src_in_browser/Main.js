@@ -3,10 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 class Main_app {
     constructor(channel) {
-        console.log("Main_app inject successfully");
         this.channel = channel;
         this.ipc_init();
-        this.send("Main_app inject successfully");
     }
     get_goeasy() {
         return eval("goeasy");
