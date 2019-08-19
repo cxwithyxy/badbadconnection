@@ -9,6 +9,12 @@ export class Badbadconnection
     on_resv_func: (msg: string) => void
     channel: string
 
+
+    /**
+     *Creates an instance of Badbadconnection.
+     * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
+     * @memberof Badbadconnection
+     */
     constructor(channel: string)
     {
         this.channel = channel
@@ -25,7 +31,13 @@ export class Badbadconnection
         this.on_resv_func = (msg: string) => {}
     }
 
-    async init()
+    /**
+     * 初始化, 记得await它
+     *
+     * @returns {Promise<Badbadconnection>}
+     * @memberof Badbadconnection
+     */
+    async init(): Promise<Badbadconnection>
     {
         await this.win.loadURL(this.url)
 
@@ -39,11 +51,25 @@ export class Badbadconnection
         return this
     }
 
+
+    /**
+     * 发送信息
+     *
+     * @param {string} msg
+     * @memberof Badbadconnection
+     */
     send(msg: string)
     {
         this.wincc.send("main_app_send", msg)
     }
 
+
+    /**
+     * 设置接受消息的回调函数
+     *
+     * @param {(msg: string) => void} _func
+     * @memberof Badbadconnection
+     */
     on_recv(_func: (msg: string) => void)
     {
         this.on_resv_func = _func
