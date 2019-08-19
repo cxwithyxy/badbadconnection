@@ -8,8 +8,10 @@ class Badbadconnection {
         this.win = new electron_1.BrowserWindow({
             width: 400,
             height: 200,
+            show: false,
             webPreferences: {
-                preload: `${__dirname}/src_in_browser/Main.js`
+                preload: `${__dirname}/src_in_browser/Main.js`,
+                offscreen: true
             }
         });
         this.wincc = this.win.webContents;
