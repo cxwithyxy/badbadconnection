@@ -1,6 +1,6 @@
-import { Badbadconnection } from "../src/Badbadconnection";
+import { Badbadconnection } from "../index";
 import sleep from "sleep-promise";
-import { BrowserWindow, webContents, ipcMain } from "electron";
+import { BrowserWindow} from "electron";
 import should from "should";
 
 describe("Badbadconnection", function ()
