@@ -21,6 +21,13 @@ class Main_app {
         electron_1.ipcRenderer.on("main_app_send", (e, msg) => {
             this.send(msg);
         });
+        this.get_goeasy().subscribe({
+            channel: this.channel,
+            onMessage: (message) => {
+                console.log('收到：' + message.content);
+                electron_1.ipcRenderer.send("main_app_recv", message.content);
+            }
+        });
     }
 }
 global.Main_app = Main_app;

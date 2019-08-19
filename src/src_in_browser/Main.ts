@@ -31,6 +31,15 @@ class Main_app
         {
             this.send(msg)
         })
+
+        this.get_goeasy().subscribe({
+            channel: this.channel,
+            onMessage: (message:{content:string}) =>
+            {
+                console.log('收到：'+ message.content)
+                ipcRenderer.send("main_app_recv", message.content)
+            }
+        });
     }
 }
 

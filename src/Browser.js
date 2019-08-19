@@ -8,7 +8,6 @@ class Browser {
             width: 400,
             height: 200,
             webPreferences: {
-                // nodeIntegration: true
                 preload: `${__dirname}/src_in_browser/Main.js`
             }
         });
@@ -17,6 +16,9 @@ class Browser {
     async init() {
         await this.win.loadURL(this.url);
         await this.wincc.executeJavaScript(`let main_app = new Main_app("demo_channel2")`);
+        electron_1.ipcMain.on("main_app_recv", (e, msg) => {
+            console.log(msg);
+        });
         this.wincc.send("main_app_send", "do do do do do");
         return this;
     }
