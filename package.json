@@ -12,5 +12,11 @@
     "electron-mocha": "^8.1.1",
     "should": "^13.2.3",
     "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "test": "tsc && electron-mocha test/*.js"
+  },
+  "dependencies": {
+    "sleep-promise": "^8.0.1"
   }
 }
