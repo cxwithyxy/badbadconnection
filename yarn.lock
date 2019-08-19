@@ -1418,6 +1418,11 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
+sleep-promise@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.npm.taobao.org/sleep-promise/download/sleep-promise-8.0.1.tgz#8d795a27ea23953df6b52b91081e5e22665993c5"
+  integrity sha1-jXlaJ+ojlT32tSuRCB5eImZZk8U=
+
 spdx-correct@^3.0.0:
   version "3.1.0"
   resolved "https://registry.npm.taobao.org/spdx-correct/download/spdx-correct-3.1.0.tgz#fb83e504445268f154b074e218c87c003cd31df4"
