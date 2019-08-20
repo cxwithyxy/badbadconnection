@@ -1,14 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
+const Encryption_string_1 = require("./Encryption_string");
 class Badbadconnection {
     /**
      *Creates an instance of Badbadconnection.
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
      * @memberof Badbadconnection
      */
-    constructor(channel) {
+    constructor(channel, encryption = false) {
         this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
+        this.encryption_string = false;
+        if (encryption) {
+            let encryption2 = encryption;
+            this.encryption_string = new Encryption_string_1.Encryption_string(encryption2.key, encryption2.counter);
+        }
         this.channel = channel;
         this.win = new electron_1.BrowserWindow({
             width: 400,
@@ -22,6 +28,18 @@ class Badbadconnection {
         this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
     }
+    try_encode(str) {
+        if (this.encryption_string) {
+            return this.encryption_string.encode(str);
+        }
+        return str;
+    }
+    try_decode(str) {
+        if (this.encryption_string) {
+            return this.encryption_string.decode(str);
+        }
+        return str;
+    }
     /**
      * 初始化, 记得await它
      *
@@ -30,9 +48,9 @@ class Badbadconnection {
      */
     async init() {
         await this.win.loadURL(this.url);
-        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.channel}")`);
+        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.try_encode(this.channel)}")`);
         electron_1.ipcMain.on("main_app_recv", (e, msg) => {
-            this.on_resv_func(msg);
+            this.on_resv_func(this.try_decode(msg));
         });
         return this;
     }
@@ -43,7 +61,7 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     send(msg) {
-        this.wincc.send("main_app_send", msg);
+        this.wincc.send("main_app_send", this.try_encode(msg));
     }
     /**
      * 设置接受消息的回调函数
