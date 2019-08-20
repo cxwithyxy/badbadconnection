@@ -1,4 +1,4 @@
-import aesjs, { Counter } from "aes-js";
+import aesjs from "aes-js";
 const MD5 = require('md5.js')
 
 export class Encryption_string
@@ -7,7 +7,6 @@ export class Encryption_string
     key_string: string
     key: Uint8Array
     counter: number
-
 
     /**
      *Creates an instance of Encryption_string.
@@ -22,7 +21,6 @@ export class Encryption_string
         this.key = aesjs.utils.utf8.toBytes(key_md5)
         this.counter = counter
     }
-
 
     /**
      * 加密字符串
@@ -39,7 +37,6 @@ export class Encryption_string
         let encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
         return encryptedHex
     }
-
 
     /**
      * 解密字符串
