@@ -15,8 +15,8 @@
     "typescript": "^3.5.3"
   },
   "scripts": {
-    "test": "tsc && electron-mocha test/*.js",
-    "test:s": "tsc && electron-mocha"
+    "test:base": "tsc && electron-mocha",
+    "test": "yarn test:base test/Encryption_string.js && yarn test:base test/Badbadconnection.js && yarn test:base test/Badbadconnection_encryption.js"
   },
   "dependencies": {
     "aes-js": "^3.1.2",
