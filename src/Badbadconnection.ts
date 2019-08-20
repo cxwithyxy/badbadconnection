@@ -1,4 +1,5 @@
 import { BrowserWindow, webContents, ipcMain } from "electron";
+import { Encryption_string } from "./Encryption_string";
 
 export class Badbadconnection
 {
@@ -8,6 +9,7 @@ export class Badbadconnection
     wincc: webContents
     on_resv_func: (msg: string) => void
     channel: string
+    encryption_string: Encryption_string | boolean = false
 
 
     /**
@@ -15,8 +17,13 @@ export class Badbadconnection
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
      * @memberof Badbadconnection
      */
-    constructor(channel: string)
+    constructor(channel: string, encryption: {key: string, counter: number} | boolean = false)
     {
+        if(encryption)
+        {
+            let encryption2 = (<{key: string, counter: number}>encryption)
+            this.encryption_string = new Encryption_string(encryption2.key, encryption2.counter)
+        }
         this.channel = channel
         this.win = new BrowserWindow({
             width: 400,
@@ -31,6 +38,24 @@ export class Badbadconnection
         this.on_resv_func = (msg: string) => {}
     }
 
+    try_encode(str: string): string
+    {
+        if(this.encryption_string)
+        {
+            return (<Encryption_string>this.encryption_string).encode(str)
+        }
+        return str
+    }
+
+    try_decode(str: string): string
+    {
+        if(this.encryption_string)
+        {
+            return (<Encryption_string>this.encryption_string).decode(str)
+        }
+        return str
+    }
+
     /**
      * 初始化, 记得await它
      *
@@ -41,11 +66,11 @@ export class Badbadconnection
     {
         await this.win.loadURL(this.url)
 
-        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.channel}")`)
+        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.try_encode(this.channel)}")`)
 
         ipcMain.on("main_app_recv", (e, msg) =>
         {
-            this.on_resv_func(msg);
+            this.on_resv_func(this.try_decode(msg))
         })
 
         return this
@@ -60,7 +85,7 @@ export class Badbadconnection
      */
     send(msg: string)
     {
-        this.wincc.send("main_app_send", msg)
+        this.wincc.send("main_app_send", this.try_encode(msg))
     }
 
 
