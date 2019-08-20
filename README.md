@@ -4,7 +4,16 @@
 
 ## 版本
 
-> v1.201908191144
+> v2.201908201135
+
+#### 历史版本
+
+| 版本            | 特性                         |
+| --------------- | ---------------------------- |
+| v2.201908201135 | 能够对消息内容进行加密和解密 |
+| v1.201908191144 | 能进行消息传递               |
+
+
 
 ## 使用
 
@@ -15,6 +24,8 @@ yarn add git+https://github.com/cxwithyxy/badbadconnection.git
 ```
 
 #### 代码编写
+
+###### 基础代码
 
 客户端A：
 
@@ -36,6 +47,14 @@ badbadconnection.on_recv((msg: string) =>
     console.log("收到消息了: " + msg)
 })
 badbadconnection.send("我是客户端B")
+```
+
+###### 启动加密
+
+采用CTR加密，传入 **密码（string）** 和 **计数器（number）** 进行实例化即可
+
+```typescript
+let badbadconnection = await new Badbadconnection("our_char_room", {key: "我的密码", counter: 7}).init()
 ```
 
 
