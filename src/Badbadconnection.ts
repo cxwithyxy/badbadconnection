@@ -1,4 +1,4 @@
-import { BrowserWindow, webContents, ipcMain } from "electron";
+import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
 
 export class Badbadconnection
@@ -68,7 +68,7 @@ export class Badbadconnection
 
         await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.try_encode(this.channel)}")`)
 
-        ipcMain.on("main_app_recv", (e, msg) =>
+        ipcMain.on("main_app_recv", (e: IpcMainEvent, msg: string) =>
         {
             this.on_resv_func(this.try_decode(msg))
         })

@@ -35,13 +35,14 @@ describe("Badbadconnection", function ()
     {
         it("是否能接受到信息", async () =>
         {
-            await new Promise((succ) =>
+            await new Promise(async (succ) =>
             {
                 badbadconnection.on_recv((msg: string) =>
                 {
                     should(msg).equal(test_msg)
                     succ()
                 })
+                await sleep(5e3)
                 test_send()
             })
         })
