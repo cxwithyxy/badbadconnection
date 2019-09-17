@@ -23,69 +23,90 @@ describe("Badbadconnection", function ()
 
     beforeEach(async () =>
     {
-        browser = new BrowserWindow({
-            width: 400,
-            height: 200
-        })
-        await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
-        badbadconnection = await new Badbadconnection(channel).init()
+        // browser = new BrowserWindow({
+        //     width: 400,
+        //     height: 200
+        // })
+        // await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
+        // badbadconnection = await new Badbadconnection(channel).init()
     })
 
-    describe("#on_recv", async () =>
-    {
-        it("是否能接受到信息", async () =>
-        {
-            await new Promise(async (succ) =>
-            {
-                badbadconnection.on_recv((msg: string) =>
-                {
-                    should(msg).equal(test_msg)
-                    succ()
-                })
-                await sleep(5e3)
-                test_send()
-            })
-        })
-    })
+    // describe("#on_recv", async () =>
+    // {
+    //     it("是否能接受到信息", async () =>
+    //     {
+    //         await new Promise(async (succ) =>
+    //         {
+    //             badbadconnection.on_recv((msg: string) =>
+    //             {
+    //                 should(msg).equal(test_msg)
+    //                 succ()
+    //             })
+    //             await sleep(5e3)
+    //             test_send()
+    //         })
+    //     })
+    // })
 
-    describe("#send", async () =>
-    {
-        it("能否发送信息", async () =>
-        {
-            await browser.webContents.executeJavaScript(`
-                test_recv = "test"
-                goeasy.subscribe({
-                    channel:'${channel}',
-                    onMessage: function(message)
-                    {
-                        test_recv = message.content
-                    }
-                });
-            `)
-            badbadconnection.send(test_msg)
-            await sleep(3e3)
-            let test_recv = await browser.webContents.executeJavaScript(`"" + test_recv`)
-            should(test_recv).equal(test_msg)
-        })
-    })
+    // describe("#send", async () =>
+    // {
+    //     it("能否发送信息", async () =>
+    //     {
+    //         await browser.webContents.executeJavaScript(`
+    //             test_recv = "test"
+    //             goeasy.subscribe({
+    //                 channel:'${channel}',
+    //                 onMessage: function(message)
+    //                 {
+    //                     test_recv = message.content
+    //                 }
+    //             });
+    //         `)
+    //         badbadconnection.send(test_msg)
+    //         await sleep(3e3)
+    //         let test_recv = await browser.webContents.executeJavaScript(`"" + test_recv`)
+    //         should(test_recv).equal(test_msg)
+    //     })
+    // })
 
-    describe("#send than resv", async () =>
+    describe("#send than recv", async () =>
     {
-        it("每次只发一条信息", async () =>
+        // it("每次只发一条信息", async () =>
+        // {
+        //     let b1 = await new Badbadconnection(channel).init()
+        //     let b2 = await new Badbadconnection(channel).init()
+        //     let recv_count = 0
+        //     b1.on_recv((msg: string) =>
+        //     {
+        //         if(msg == test_msg)
+        //         {
+        //             recv_count ++;
+        //         }
+        //     })
+        //     b2.send(test_msg)
+        //     await sleep(5 * 1e3)
+        //     should(recv_count).equal(1)
+        // })
+
+        it("不会受到自己发送的信息", async () =>
         {
-            let b1 = await new Badbadconnection(channel).init()
             let b2 = await new Badbadconnection(channel).init()
-            let resv_count = 0
+            let b1 = await new Badbadconnection(channel).init()
+            let b1_send = `b1_send${Math.random()}`
+            let b1_recv: string = ""
+            let b2_recv: string = ""
+            b2.on_recv((msg: string) =>
+            {
+                b2_recv = msg
+            })
             b1.on_recv((msg: string) =>
             {
-                if(msg == test_msg)
-                {
-                    resv_count ++;
-                }
+                b1_recv = msg
             })
-            b2.send(test_msg)
-            await sleep(5 * 1e3)
-            should(resv_count).equal(1)
+            b1.send(b1_send)
+            await sleep(2e3)
+            should(b1_recv).not.equal(b1_send)
+            should(b2_recv).equal(b1_send)
         })
     })
 })
