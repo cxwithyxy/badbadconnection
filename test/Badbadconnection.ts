@@ -28,46 +28,46 @@ describe("Badbadconnection", function ()
             height: 200
         })
         await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
-        // badbadconnection = await new Badbadconnection(channel).init()
+        badbadconnection = await new Badbadconnection(channel).init()
     })
 
-    // describe("#on_recv", async () =>
-    // {
-    //     it("是否能接受到信息", async () =>
-    //     {
-    //         await new Promise(async (succ) =>
-    //         {
-    //             badbadconnection.on_recv((msg: string) =>
-    //             {
-    //                 should(msg).equal(test_msg)
-    //                 succ()
-    //             })
-    //             await sleep(5e3)
-    //             test_send()
-    //         })
-    //     })
-    // })
+    describe("#on_recv", async () =>
+    {
+        it("是否能接受到信息", async () =>
+        {
+            await new Promise(async (succ) =>
+            {
+                badbadconnection.on_recv((msg: string) =>
+                {
+                    should(msg).equal(test_msg)
+                    succ()
+                })
+                await sleep(5e3)
+                test_send()
+            })
+        })
+    })
 
-    // describe("#send", async () =>
-    // {
-    //     it("能否发送信息", async () =>
-    //     {
-    //         await browser.webContents.executeJavaScript(`
-    //             test_recv = "test"
-    //             goeasy.subscribe({
-    //                 channel:'${channel}',
-    //                 onMessage: function(message)
-    //                 {
-    //                     test_recv = message.content
-    //                 }
-    //             });
-    //         `)
-    //         badbadconnection.send(test_msg)
-    //         await sleep(3e3)
-    //         let test_recv = await browser.webContents.executeJavaScript(`"" + test_recv`)
-    //         should(test_recv).equal(test_msg)
-    //     })
-    // })
+    describe("#send", async () =>
+    {
+        it("能否发送信息", async () =>
+        {
+            await browser.webContents.executeJavaScript(`
+                test_recv = "test"
+                goeasy.subscribe({
+                    channel:'${channel}',
+                    onMessage: function(message)
+                    {
+                        test_recv = message.content
+                    }
+                });
+            `)
+            badbadconnection.send(test_msg)
+            await sleep(3e3)
+            let test_recv = await browser.webContents.executeJavaScript(`"" + test_recv`)
+            should(test_recv).equal(test_msg)
+        })
+    })
 
     describe("#send than resv", async () =>
     {
@@ -82,8 +82,6 @@ describe("Badbadconnection", function ()
                 {
                     resv_count ++;
                 }
-                console.log(resv_count);
-                
             })
             b2.send(test_msg)
             await sleep(5 * 1e3)
