@@ -11,6 +11,7 @@ class Badbadconnection {
     constructor(channel, encryption = false) {
         this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
         this.encryption_string = false;
+        this.sending_msg_md5 = "";
         this.event_name_init();
         if (encryption) {
             let encryption2 = encryption;
@@ -31,8 +32,8 @@ class Badbadconnection {
     }
     event_name_init() {
         this.c_event = {
-            main_app_recv: `main_app_recv${Date.now()}${Math.random}`,
-            main_app_send: `main_app_send${Date.now()}${Math.random}`
+            main_app_recv: `main_app_recv${Date.now()}${Math.random()}`,
+            main_app_send: `main_app_send${Date.now()}${Math.random()}`
         };
     }
     try_encode(str) {
@@ -65,7 +66,12 @@ class Badbadconnection {
             )
         `);
         electron_1.ipcMain.on(this.c_event.main_app_recv, (e, msg) => {
-            this.on_resv_func(this.try_decode(msg));
+            let decode_msg = this.try_decode(msg);
+            let msg_md5 = decode_msg.substring(0, 32);
+            if (msg_md5 != this.sending_msg_md5) {
+                let recv_msg = decode_msg.substring(32);
+                this.on_resv_func(recv_msg);
+            }
         });
         return this;
     }
@@ -76,6 +82,8 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     send(msg) {
+        this.sending_msg_md5 = this.build_sending_msg_md5();
+        msg = this.sending_msg_md5 + msg;
         this.wincc.send(this.c_event.main_app_send, this.try_encode(msg));
     }
     /**
@@ -86,6 +94,11 @@ class Badbadconnection {
      */
     on_recv(_func) {
         this.on_resv_func = _func;
+    }
+    build_sending_msg_md5() {
+        let msg_md5;
+        msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
+        return msg_md5;
     }
 }
 exports.Badbadconnection = Badbadconnection;

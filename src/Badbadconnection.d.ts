@@ -9,6 +9,7 @@ export declare class Badbadconnection {
     channel: string;
     encryption_string: Encryption_string | boolean;
     c_event: connection_event;
+    sending_msg_md5: string;
     /**
      *Creates an instance of Badbadconnection.
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
@@ -42,4 +43,5 @@ export declare class Badbadconnection {
      * @memberof Badbadconnection
      */
     on_recv(_func: (msg: string) => void): void;
+    build_sending_msg_md5(): string;
 }

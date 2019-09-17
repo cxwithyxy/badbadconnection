@@ -23,12 +23,12 @@ describe("Badbadconnection", function ()
 
     beforeEach(async () =>
     {
-        browser = new BrowserWindow({
-            width: 400,
-            height: 200
-        })
-        await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
-        badbadconnection = await new Badbadconnection(channel).init()
+        // browser = new BrowserWindow({
+        //     width: 400,
+        //     height: 200
+        // })
+        // await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
+        // badbadconnection = await new Badbadconnection(channel).init()
     })
 
     // describe("#on_recv", async () =>
@@ -69,44 +69,44 @@ describe("Badbadconnection", function ()
     //     })
     // })
 
-    describe("#send than resv", async () =>
+    describe("#send than recv", async () =>
     {
         // it("每次只发一条信息", async () =>
         // {
         //     let b1 = await new Badbadconnection(channel).init()
         //     let b2 = await new Badbadconnection(channel).init()
-        //     let resv_count = 0
+        //     let recv_count = 0
         //     b1.on_recv((msg: string) =>
         //     {
         //         if(msg == test_msg)
         //         {
-        //             resv_count ++;
+        //             recv_count ++;
         //         }
         //     })
         //     b2.send(test_msg)
         //     await sleep(5 * 1e3)
-        //     should(resv_count).equal(1)
+        //     should(recv_count).equal(1)
         // })
 
         it("不会受到自己发送的信息", async () =>
         {
-            let b1 = await new Badbadconnection(channel).init()
             let b2 = await new Badbadconnection(channel).init()
+            let b1 = await new Badbadconnection(channel).init()
             let b1_send = `b1_send${Math.random()}`
-            let b1_resv: string = ""
-            let b2_resv: string = ""
-            b1.on_recv((msg: string) =>
-            {
-                b1_resv = msg
-            })
+            let b1_recv: string = ""
+            let b2_recv: string = ""
             b2.on_recv((msg: string) =>
             {
-                b2_resv = msg
+                b2_recv = msg
+            })
+            b1.on_recv((msg: string) =>
+            {
+                b1_recv = msg
             })
             b1.send(b1_send)
-            await sleep(1e3)
-            should(b1_resv).not.equal(b1_send)
-            should(b2_resv).equal(b1_send)
+            await sleep(2e3)
+            should(b1_recv).not.equal(b1_send)
+            should(b2_recv).equal(b1_send)
         })
     })
 })
