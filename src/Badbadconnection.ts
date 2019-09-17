@@ -1,5 +1,6 @@
 import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
+import { connection_event } from "./connection_event";
 
 export class Badbadconnection
 {
@@ -10,6 +11,7 @@ export class Badbadconnection
     on_resv_func: (msg: string) => void
     channel: string
     encryption_string: Encryption_string | boolean = false
+    c_event!: connection_event
 
 
     /**
@@ -19,6 +21,7 @@ export class Badbadconnection
      */
     constructor(channel: string, encryption: {key: string, counter: number} | boolean = false)
     {
+        this.event_name_init()
         if(encryption)
         {
             let encryption2 = (<{key: string, counter: number}>encryption)
@@ -36,6 +39,14 @@ export class Badbadconnection
         })
         this.wincc = this.win.webContents
         this.on_resv_func = (msg: string) => {}
+    }
+
+    event_name_init()
+    {
+        this.c_event = {
+            main_app_recv: `main_app_recv${Date.now()}${Math.random}`,
+            main_app_send: `main_app_send${Date.now()}${Math.random}`
+        }
     }
 
     try_encode(str: string): string
@@ -66,9 +77,17 @@ export class Badbadconnection
     {
         await this.win.loadURL(this.url)
 
-        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.try_encode(this.channel)}")`)
+        await this.wincc.executeJavaScript(`
+            let main_app = new Main_app(
+                "${this.try_encode(this.channel)}",
+                {
+                    main_app_recv: "${this.c_event.main_app_recv}",
+                    main_app_send: "${this.c_event.main_app_send}"
+                }
+            )
+        `)
 
-        ipcMain.on("main_app_recv", (e: IpcMainEvent, msg: string) =>
+        ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
             this.on_resv_func(this.try_decode(msg))
         })
@@ -85,7 +104,7 @@ export class Badbadconnection
      */
     send(msg: string)
     {
-        this.wincc.send("main_app_send", this.try_encode(msg))
+        this.wincc.send(this.c_event.main_app_send, this.try_encode(msg))
     }
 
 

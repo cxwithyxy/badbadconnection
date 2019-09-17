@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 class Main_app {
-    constructor(channel) {
+    constructor(channel, c_event) {
         this.channel = channel;
+        this.c_event = c_event;
         this.ipc_init();
     }
     get_goeasy() {
@@ -16,13 +17,13 @@ class Main_app {
         });
     }
     ipc_init() {
-        electron_1.ipcRenderer.on("main_app_send", (e, msg) => {
+        electron_1.ipcRenderer.on(this.c_event.main_app_send, (e, msg) => {
             this.send(msg);
         });
         this.get_goeasy().subscribe({
             channel: this.channel,
             onMessage: (message) => {
-                electron_1.ipcRenderer.send("main_app_recv", message.content);
+                electron_1.ipcRenderer.send(this.c_event.main_app_recv, message.content);
             }
         });
     }

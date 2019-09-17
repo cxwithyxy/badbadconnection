@@ -1,12 +1,15 @@
 import { ipcRenderer } from "electron";
+import { connection_event } from "./../connection_event";
 
 class Main_app
 {
     channel: string
+    c_event: connection_event
 
-    constructor(channel: string)
+    constructor(channel: string, c_event: connection_event)
     {
         this.channel = channel
+        this.c_event = c_event
         this.ipc_init()
     }
 
@@ -25,7 +28,7 @@ class Main_app
 
     ipc_init()
     {
-        ipcRenderer.on("main_app_send", (e, msg) =>
+        ipcRenderer.on(this.c_event.main_app_send, (e, msg) =>
         {
             this.send(msg)
         })
@@ -34,7 +37,7 @@ class Main_app
             channel: this.channel,
             onMessage: (message:{content:string}) =>
             {
-                ipcRenderer.send("main_app_recv", message.content)
+                ipcRenderer.send(this.c_event.main_app_recv, message.content)
             }
         });
     }
