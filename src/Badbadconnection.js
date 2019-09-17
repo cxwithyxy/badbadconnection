@@ -11,6 +11,7 @@ class Badbadconnection {
     constructor(channel, encryption = false) {
         this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
         this.encryption_string = false;
+        this.event_name_init();
         if (encryption) {
             let encryption2 = encryption;
             this.encryption_string = new Encryption_string_1.Encryption_string(encryption2.key, encryption2.counter);
@@ -27,6 +28,12 @@ class Badbadconnection {
         });
         this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
+    }
+    event_name_init() {
+        this.c_event = {
+            main_app_recv: `main_app_recv${Date.now()}${Math.random}`,
+            main_app_send: `main_app_send${Date.now()}${Math.random}`
+        };
     }
     try_encode(str) {
         if (this.encryption_string) {
@@ -48,8 +55,16 @@ class Badbadconnection {
      */
     async init() {
         await this.win.loadURL(this.url);
-        await this.wincc.executeJavaScript(`let main_app = new Main_app("${this.try_encode(this.channel)}")`);
-        electron_1.ipcMain.on("main_app_recv", (e, msg) => {
+        await this.wincc.executeJavaScript(`
+            let main_app = new Main_app(
+                "${this.try_encode(this.channel)}",
+                {
+                    main_app_recv: "${this.c_event.main_app_recv}",
+                    main_app_send: "${this.c_event.main_app_send}"
+                }
+            )
+        `);
+        electron_1.ipcMain.on(this.c_event.main_app_recv, (e, msg) => {
             this.on_resv_func(this.try_decode(msg));
         });
         return this;
@@ -61,7 +76,7 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     send(msg) {
-        this.wincc.send("main_app_send", this.try_encode(msg));
+        this.wincc.send(this.c_event.main_app_send, this.try_encode(msg));
     }
     /**
      * 设置接受消息的回调函数
