@@ -68,4 +68,24 @@ describe("Badbadconnection", function ()
             should(test_recv).equal(test_msg)
         })
     })
+
+    describe("#send than resv", async () =>
+    {
+        it("每次只发一条信息", async () =>
+        {
+            let b1 = await new Badbadconnection(channel).init()
+            let b2 = await new Badbadconnection(channel).init()
+            let resv_count = 0
+            b1.on_recv((msg: string) =>
+            {
+                if(msg == test_msg)
+                {
+                    resv_count ++;
+                }
+            })
+            b2.send(test_msg)
+            await sleep(5e3)
+            should(resv_count).equal(1)
+        })
+    })
 })
