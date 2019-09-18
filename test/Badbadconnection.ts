@@ -90,8 +90,8 @@ describe("Badbadconnection", function ()
 
         it("不会受到自己发送的信息", async () =>
         {
-            let b2 = await new Badbadconnection(channel).init()
             let b1 = await new Badbadconnection(channel).init()
+            let b2 = await new Badbadconnection(channel).init()
             let b1_send = `b1_send${Math.random()}`
             let b1_recv: string = ""
             let b2_recv: string = ""

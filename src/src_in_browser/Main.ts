@@ -10,7 +10,6 @@ class Main_app
     {
         this.channel = channel
         this.c_event = c_event
-        this.ipc_init()
     }
 
     get_goeasy(): any
@@ -26,20 +25,29 @@ class Main_app
         })
     }
 
-    ipc_init()
+    async ipc_init()
     {
-        ipcRenderer.on(this.c_event.main_app_send, (e, msg) =>
+        return new Promise((succ, fail) =>
         {
-            this.send(msg)
-        })
-
-        this.get_goeasy().subscribe({
-            channel: this.channel,
-            onMessage: (message:{content:string}) =>
+            ipcRenderer.on(this.c_event.main_app_send, (e, msg) =>
             {
-                ipcRenderer.send(this.c_event.main_app_recv, message.content)
-            }
-        });
+                this.send(msg)
+            })
+
+            this.get_goeasy().subscribe({
+                channel: this.channel,
+                onMessage: (message:{content:string}) =>
+                {
+                    ipcRenderer.send(this.c_event.main_app_recv, message.content)
+                },
+                onSuccess: function () {
+                    succ()
+                },
+                onFailed: function (error: {code:string, content: string}) {
+                    fail(error.content)
+                }
+            });
+        })
     }
 }
 
