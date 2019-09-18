@@ -80,13 +80,16 @@ export class Badbadconnection
         await this.win.loadURL(this.url)
 
         await this.wincc.executeJavaScript(`
-            let main_app = new Main_app(
-                "${this.try_encode(this.channel)}",
-                {
-                    main_app_recv: "${this.c_event.main_app_recv}",
-                    main_app_send: "${this.c_event.main_app_send}"
-                }
-            )
+            (async () =>{
+                let main_app = new Main_app(
+                    "${this.try_encode(this.channel)}",
+                    {
+                        main_app_recv: "${this.c_event.main_app_recv}",
+                        main_app_send: "${this.c_event.main_app_send}"
+                    }
+                );
+                await main_app.ipc_init();
+            })()
         `)
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
