@@ -17,7 +17,7 @@ export class Encryption_string
     constructor(key_string: string, counter: number = 1)
     {
         this.key_string = key_string
-        let key_md5:string = new MD5().update(key_string).digest('hex')
+        let key_md5:string = Encryption_string.get_md5(key_string)
         this.key = aesjs.utils.utf8.toBytes(key_md5)
         this.counter = counter
     }
@@ -52,5 +52,10 @@ export class Encryption_string
         let decryptedBytes = aesCtr.decrypt(encryptedBytes);
         let decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
         return decryptedText
+    }
+
+    static get_md5(source: string): string
+    {
+        return new MD5().update(source).digest('hex')
     }
 }

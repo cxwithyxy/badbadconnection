@@ -25,4 +25,5 @@ export declare class Encryption_string {
      * @memberof Encryption_string
      */
     decode(target_str: string): string;
+    static get_md5(source: string): string;
 }

@@ -12,6 +12,7 @@ export class Badbadconnection
     channel: string
     encryption_string: Encryption_string | boolean = false
     c_event!: connection_event
+    sending_msg_md5!: string
 
 
     /**
@@ -21,6 +22,7 @@ export class Badbadconnection
      */
     constructor(channel: string, encryption: {key: string, counter: number} | boolean = false)
     {
+        this.sending_msg_md5 = ""
         this.event_name_init()
         if(encryption)
         {
@@ -44,8 +46,8 @@ export class Badbadconnection
     event_name_init()
     {
         this.c_event = {
-            main_app_recv: `main_app_recv${Date.now()}${Math.random}`,
-            main_app_send: `main_app_send${Date.now()}${Math.random}`
+            main_app_recv: `main_app_recv${Date.now()}${Math.random()}`,
+            main_app_send: `main_app_send${Date.now()}${Math.random()}`
         }
     }
 
@@ -78,20 +80,28 @@ export class Badbadconnection
         await this.win.loadURL(this.url)
 
         await this.wincc.executeJavaScript(`
-            let main_app = new Main_app(
-                "${this.try_encode(this.channel)}",
-                {
-                    main_app_recv: "${this.c_event.main_app_recv}",
-                    main_app_send: "${this.c_event.main_app_send}"
-                }
-            )
+            (async () =>{
+                let main_app = new Main_app(
+                    "${this.try_encode(this.channel)}",
+                    {
+                        main_app_recv: "${this.c_event.main_app_recv}",
+                        main_app_send: "${this.c_event.main_app_send}"
+                    }
+                );
+                await main_app.ipc_init();
+            })()
         `)
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            this.on_resv_func(this.try_decode(msg))
+            let decode_msg = this.try_decode(msg)
+            let msg_md5 = decode_msg.substring(0, 32)
+            if(msg_md5 != this.sending_msg_md5)
+            {
+                let recv_msg = decode_msg.substring(32)
+                this.on_resv_func(recv_msg)
+            }
         })
-
         return this
     }
 
@@ -104,6 +114,8 @@ export class Badbadconnection
      */
     send(msg: string)
     {
+        this.sending_msg_md5 = this.build_sending_msg_md5()
+        msg = this.sending_msg_md5 + msg
         this.wincc.send(this.c_event.main_app_send, this.try_encode(msg))
     }
 
@@ -117,6 +129,13 @@ export class Badbadconnection
     on_recv(_func: (msg: string) => void)
     {
         this.on_resv_func = _func
+    }
+
+    build_sending_msg_md5(): string
+    {
+        let msg_md5: string
+        msg_md5 = Encryption_string.get_md5(String(Math.random()))
+        return msg_md5
     }
 
 }

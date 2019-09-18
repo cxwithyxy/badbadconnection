@@ -5,7 +5,6 @@ class Main_app {
     constructor(channel, c_event) {
         this.channel = channel;
         this.c_event = c_event;
-        this.ipc_init();
     }
     get_goeasy() {
         return eval("goeasy");
@@ -16,15 +15,23 @@ class Main_app {
             message: msg
         });
     }
-    ipc_init() {
-        electron_1.ipcRenderer.on(this.c_event.main_app_send, (e, msg) => {
-            this.send(msg);
-        });
-        this.get_goeasy().subscribe({
-            channel: this.channel,
-            onMessage: (message) => {
-                electron_1.ipcRenderer.send(this.c_event.main_app_recv, message.content);
-            }
+    async ipc_init() {
+        return new Promise((succ, fail) => {
+            electron_1.ipcRenderer.on(this.c_event.main_app_send, (e, msg) => {
+                this.send(msg);
+            });
+            this.get_goeasy().subscribe({
+                channel: this.channel,
+                onMessage: (message) => {
+                    electron_1.ipcRenderer.send(this.c_event.main_app_recv, message.content);
+                },
+                onSuccess: function () {
+                    succ();
+                },
+                onFailed: function (error) {
+                    fail(error.content);
+                }
+            });
         });
     }
 }
