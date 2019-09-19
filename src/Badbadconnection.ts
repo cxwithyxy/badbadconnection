@@ -138,4 +138,9 @@ export class Badbadconnection
         return msg_md5
     }
 
+    close()
+    {
+        this.win.close()
+    }
+
 }
