@@ -44,4 +44,5 @@ export declare class Badbadconnection {
      */
     on_recv(_func: (msg: string) => void): void;
     build_sending_msg_md5(): string;
+    close(): void;
 }
