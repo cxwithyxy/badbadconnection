@@ -103,5 +103,8 @@ class Badbadconnection {
         msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
         return msg_md5;
     }
+    close() {
+        this.win.close();
+    }
 }
 exports.Badbadconnection = Badbadconnection;
