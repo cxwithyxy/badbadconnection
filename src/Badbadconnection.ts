@@ -94,12 +94,12 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let decode_msg = this.try_decode(msg)
-            let msg_md5 = decode_msg.substring(0, 32)
+            let msg_md5 = msg.substring(0, 32)
             if(msg_md5 != this.sending_msg_md5)
             {
-                let recv_msg = decode_msg.substring(32)
-                this.on_resv_func(recv_msg)
+                let recv_msg = msg.substring(32)
+                let decode_msg = this.try_decode(recv_msg)
+                this.on_resv_func(decode_msg)
             }
         })
         return this
@@ -115,8 +115,8 @@ export class Badbadconnection
     send(msg: string)
     {
         this.sending_msg_md5 = this.build_sending_msg_md5()
-        msg = this.sending_msg_md5 + msg
-        this.wincc.send(this.c_event.main_app_send, this.try_encode(msg))
+        msg = this.sending_msg_md5 + this.try_encode(msg)
+        this.wincc.send(this.c_event.main_app_send, msg)
     }
 
 
