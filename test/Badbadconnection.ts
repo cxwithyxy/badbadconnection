@@ -44,17 +44,22 @@ describe("Badbadconnection", function ()
 
         it("每次只发一条信息", async () =>
         {
-            let recv_count = 0
+            let recv_str_list: string[] = []
+            let send_time_loop = 5
             b1.on_recv((msg: string) =>
             {
-                if(msg == test_msg)
-                {
-                    recv_count ++;
-                }
+                recv_str_list.push(msg)
             })
-            b2.send(test_msg)
+            for(let i  = 0; i < 5; i++)
+            {
+                await b2.send(`${test_msg}${i}`)
+            }
             await sleep(5 * 1e3)
-            should(recv_count).equal(1)
+            should(recv_str_list.length).equal(send_time_loop)
+            for(let i  = 0; i < 5; i++)
+            {
+                should(recv_str_list[i]).equal(`${test_msg}${i}`)
+            }
         })
 
         it("不会受到自己发送的信息", async () =>
@@ -82,7 +87,7 @@ describe("Badbadconnection", function ()
                     succ()
                 }, 5e3)
             })
-            b1.send(b1_send)
+            await b1.send(b1_send)
             await Promise.all([b1_promise, b2_promise])
             should(b1_recv).not.equal(b1_send)
             should(b2_recv).equal(b1_send)

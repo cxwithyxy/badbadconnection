@@ -10,6 +10,7 @@ export declare class Badbadconnection {
     encryption_string: Encryption_string | boolean;
     c_event: connection_event;
     sending_msg_md5: string;
+    send_finish_callback?: () => void;
     /**
      *Creates an instance of Badbadconnection.
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
@@ -35,7 +36,7 @@ export declare class Badbadconnection {
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg: string): void;
+    send(msg: string): Promise<unknown>;
     /**
      * 设置接受消息的回调函数
      *

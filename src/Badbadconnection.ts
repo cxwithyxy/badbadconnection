@@ -13,6 +13,7 @@ export class Badbadconnection
     encryption_string: Encryption_string | boolean = false
     c_event!: connection_event
     sending_msg_md5!: string
+    send_finish_callback?: () => void
 
 
     /**
@@ -95,7 +96,15 @@ export class Badbadconnection
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
             let msg_md5 = this.get_data(msg, "md5")
-            if(msg_md5 != this.sending_msg_md5)
+            if(msg_md5 == this.sending_msg_md5)
+            {
+                if(this.send_finish_callback)
+                {
+                    this.send_finish_callback()
+                    this.send_finish_callback = undefined
+                }
+            }
+            else
             {
                 let recv_msg = this.get_data(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
@@ -112,11 +121,15 @@ export class Badbadconnection
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg: string)
+    async send(msg: string)
     {
-        this.sending_msg_md5 = this.build_sending_msg_md5()
-        msg = this.sending_msg_md5 + this.try_encode(msg)
-        this.wincc.send(this.c_event.main_app_send, msg)
+        return new Promise(succ =>
+        {
+            this.send_finish_callback = succ
+            this.sending_msg_md5 = this.build_sending_msg_md5()
+            msg = this.sending_msg_md5 + this.try_encode(msg)
+            this.wincc.send(this.c_event.main_app_send, msg)
+        })
     }
 
 

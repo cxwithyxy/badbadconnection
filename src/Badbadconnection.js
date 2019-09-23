@@ -71,7 +71,13 @@ class Badbadconnection {
         `);
         electron_1.ipcMain.on(this.c_event.main_app_recv, (e, msg) => {
             let msg_md5 = this.get_data(msg, "md5");
-            if (msg_md5 != this.sending_msg_md5) {
+            if (msg_md5 == this.sending_msg_md5) {
+                if (this.send_finish_callback) {
+                    this.send_finish_callback();
+                    this.send_finish_callback = undefined;
+                }
+            }
+            else {
                 let recv_msg = this.get_data(msg, "data");
                 let decode_msg = this.try_decode(recv_msg);
                 this.on_resv_func(decode_msg);
@@ -85,10 +91,13 @@ class Badbadconnection {
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg) {
-        this.sending_msg_md5 = this.build_sending_msg_md5();
-        msg = this.sending_msg_md5 + this.try_encode(msg);
-        this.wincc.send(this.c_event.main_app_send, msg);
+    async send(msg) {
+        return new Promise(succ => {
+            this.send_finish_callback = succ;
+            this.sending_msg_md5 = this.build_sending_msg_md5();
+            msg = this.sending_msg_md5 + this.try_encode(msg);
+            this.wincc.send(this.c_event.main_app_send, msg);
+        });
     }
     /**
      * 设置接受消息的回调函数
