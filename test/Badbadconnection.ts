@@ -23,11 +23,25 @@ describe("Badbadconnection", function ()
     {
         b1.close()
         b2.close()
-        await sleep(5e3)
     })
 
     describe("基础通讯", async () =>
     {
+        it("发信息并收信息", async () =>
+        {
+            let recv_msg = ""
+            await new Promise((succ) =>
+            {
+                b1.on_recv((msg: string) =>
+                {
+                    recv_msg = msg
+                    succ()
+                })
+                b2.send(test_msg)
+            })
+            should(recv_msg).equal(test_msg)
+        })
+
         it("每次只发一条信息", async () =>
         {
             let recv_count = 0
@@ -48,16 +62,28 @@ describe("Badbadconnection", function ()
             let b1_send = `b1_send${Math.random()}`
             let b1_recv: string = ""
             let b2_recv: string = ""
-            b2.on_recv((msg: string) =>
+            let b2_promise = new Promise((succ) =>
             {
-                b2_recv = msg
+                b2.on_recv((msg: string) =>
+                {
+                    b2_recv = msg
+                    succ()
+                })
             })
-            b1.on_recv((msg: string) =>
+            let b1_promise = new Promise((succ) =>
             {
-                b1_recv = msg
+                b1.on_recv((msg: string) =>
+                {
+                    b1_recv = msg
+                    succ()
+                })
+                setTimeout(() =>
+                {
+                    succ()
+                }, 5e3)
             })
             b1.send(b1_send)
-            await sleep(2e3)
+            await Promise.all([b1_promise, b2_promise])
             should(b1_recv).not.equal(b1_send)
             should(b2_recv).equal(b1_send)
         })
