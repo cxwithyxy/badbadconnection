@@ -56,9 +56,10 @@ class Badbadconnection {
      */
     async init() {
         await this.win.loadURL(this.url);
+        await this.wincc.executeJavaScript(`let main_app`);
         await this.wincc.executeJavaScript(`
             (async () =>{
-                let main_app = new Main_app(
+                main_app = new Main_app(
                     "${this.try_encode(this.channel)}",
                     {
                         main_app_recv: "${this.c_event.main_app_recv}",
@@ -103,7 +104,8 @@ class Badbadconnection {
         msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
         return msg_md5;
     }
-    close() {
+    async close() {
+        await this.wincc.executeJavaScript(`main_app.close()`);
         this.win.close();
     }
 }

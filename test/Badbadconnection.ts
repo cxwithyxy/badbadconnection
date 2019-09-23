@@ -21,8 +21,8 @@ describe("Badbadconnection", function ()
 
     afterEach(async () =>
     {
-        b1.close()
-        b2.close()
+        await b1.close()
+        await b2.close()
     })
 
     describe("基础通讯", async () =>

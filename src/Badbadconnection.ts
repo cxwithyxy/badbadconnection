@@ -78,10 +78,10 @@ export class Badbadconnection
     async init(): Promise<Badbadconnection>
     {
         await this.win.loadURL(this.url)
-
+        await this.wincc.executeJavaScript(`let main_app`)
         await this.wincc.executeJavaScript(`
             (async () =>{
-                let main_app = new Main_app(
+                main_app = new Main_app(
                     "${this.try_encode(this.channel)}",
                     {
                         main_app_recv: "${this.c_event.main_app_recv}",
@@ -138,8 +138,9 @@ export class Badbadconnection
         return msg_md5
     }
 
-    close()
+    async close()
     {
+        await this.wincc.executeJavaScript(`main_app.close()`)
         this.win.close()
     }
 
