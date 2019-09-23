@@ -9,8 +9,9 @@ export declare class Badbadconnection {
     channel: string;
     encryption_string: Encryption_string | boolean;
     c_event: connection_event;
-    sending_msg_md5: string;
+    sending_package_md5: string;
     send_finish_callback?: () => void;
+    package_data_length: number;
     /**
      *Creates an instance of Badbadconnection.
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
@@ -36,7 +37,8 @@ export declare class Badbadconnection {
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg: string): Promise<unknown>;
+    send(msg: string): Promise<void>;
+    send_package(msg_md5: string, total_length: number, current_index: number, package_data: string): Promise<unknown>;
     /**
      * 设置接受消息的回调函数
      *
@@ -46,17 +48,17 @@ export declare class Badbadconnection {
     on_recv(_func: (msg: string) => void): void;
     /**
      * 解析数据包
-     * 0-32: md5
-     * 32-45: 总大小
-     * 45-58: 当前位置
-     * 58-71: 结束位置
-     * 71-end: 数据
+     * 32: md5
+     * 64: 信息识别码
+     * 77: 总大小
+     * 90: 当前位置
+     * end: 数据
      * @param {string} source_str
      * @param {("md5" | "total" | "start" | "end" | "data")} type
      * @returns {string}
      * @memberof Badbadconnection
      */
-    get_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string;
-    build_sending_msg_md5(): string;
+    get_package_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string;
+    build_random_md5(): string;
     close(): Promise<void>;
 }

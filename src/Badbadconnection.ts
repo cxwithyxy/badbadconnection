@@ -12,8 +12,9 @@ export class Badbadconnection
     channel: string
     encryption_string: Encryption_string | boolean = false
     c_event!: connection_event
-    sending_msg_md5!: string
+    sending_package_md5!: string
     send_finish_callback?: () => void
+    package_data_length = 6
 
 
     /**
@@ -23,7 +24,7 @@ export class Badbadconnection
      */
     constructor(channel: string, encryption: {key: string, counter: number} | boolean = false)
     {
-        this.sending_msg_md5 = ""
+        this.sending_package_md5 = ""
         this.event_name_init()
         if(encryption)
         {
@@ -95,8 +96,8 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let msg_md5 = this.get_data(msg, "md5")
-            if(msg_md5 == this.sending_msg_md5)
+            let package_md5 = this.get_package_data(msg, "md5")
+            if(package_md5 == this.sending_package_md5)
             {
                 if(this.send_finish_callback)
                 {
@@ -106,7 +107,7 @@ export class Badbadconnection
             }
             else
             {
-                let recv_msg = this.get_data(msg, "data")
+                let recv_msg = this.get_package_data(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
                 this.on_resv_func(decode_msg)
             }
@@ -121,14 +122,34 @@ export class Badbadconnection
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    async send(msg: string)
+
+    async send(msg:string)
+    {
+        let msg_for_send = this.try_encode(msg)
+        let msg_md5 = this.build_random_md5()
+        let total_length = msg_for_send.length
+        let current_index = 0
+        for(;;)
+        {
+            let package_data = msg_for_send.substr(current_index, this.package_data_length)
+            console.log(`${current_index}: ${package_data}`);
+            current_index += this.package_data_length
+            if(current_index >= total_length)
+            {
+                break
+            }
+            
+        }
+    }
+
+    async send_package(msg_md5: string, total_length: number, current_index: number, package_data: string, )
     {
         return new Promise(succ =>
         {
             this.send_finish_callback = succ
-            this.sending_msg_md5 = this.build_sending_msg_md5()
-            msg = this.sending_msg_md5 + this.try_encode(msg)
-            this.wincc.send(this.c_event.main_app_send, msg)
+            this.sending_package_md5 = this.build_random_md5()
+            let package_for_send = this.sending_package_md5 + package_data
+            this.wincc.send(this.c_event.main_app_send, package_for_send)
         })
     }
 
@@ -146,17 +167,17 @@ export class Badbadconnection
 
     /**
      * 解析数据包
-     * 0-32: md5
-     * 32-45: 总大小
-     * 45-58: 当前位置
-     * 58-71: 结束位置
-     * 71-end: 数据
+     * 32: md5
+     * 64: 信息识别码
+     * 77: 总大小
+     * 90: 当前位置
+     * end: 数据
      * @param {string} source_str
      * @param {("md5" | "total" | "start" | "end" | "data")} type
      * @returns {string}
      * @memberof Badbadconnection
      */
-    get_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string
+    get_package_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string
     {
         let low_type = type.toLowerCase()
         if(low_type == "md5")
@@ -167,10 +188,10 @@ export class Badbadconnection
         {
             return source_str.substring(32)
         }
-        throw new Error(`fucntion "get_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
+        throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }
 
-    build_sending_msg_md5(): string
+    build_random_md5(): string
     {
         let msg_md5: string
         msg_md5 = Encryption_string.get_md5(String(Math.random()))
