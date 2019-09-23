@@ -43,6 +43,19 @@ export declare class Badbadconnection {
      * @memberof Badbadconnection
      */
     on_recv(_func: (msg: string) => void): void;
+    /**
+     * 解析数据包
+     * 0-32: md5
+     * 32-45: 总大小
+     * 45-58: 当前位置
+     * 58-71: 结束位置
+     * 71-end: 数据
+     * @param {string} source_str
+     * @param {("md5" | "total" | "start" | "end" | "data")} type
+     * @returns {string}
+     * @memberof Badbadconnection
+     */
+    get_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string;
     build_sending_msg_md5(): string;
     close(): Promise<void>;
 }

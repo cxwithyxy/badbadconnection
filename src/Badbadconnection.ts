@@ -94,10 +94,10 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let msg_md5 = msg.substring(0, 32)
+            let msg_md5 = this.get_data(msg, "md5")
             if(msg_md5 != this.sending_msg_md5)
             {
-                let recv_msg = msg.substring(32)
+                let recv_msg = this.get_data(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
                 this.on_resv_func(decode_msg)
             }
@@ -129,6 +129,32 @@ export class Badbadconnection
     on_recv(_func: (msg: string) => void)
     {
         this.on_resv_func = _func
+    }
+
+    /**
+     * 解析数据包
+     * 0-32: md5
+     * 32-45: 总大小
+     * 45-58: 当前位置
+     * 58-71: 结束位置
+     * 71-end: 数据
+     * @param {string} source_str
+     * @param {("md5" | "total" | "start" | "end" | "data")} type
+     * @returns {string}
+     * @memberof Badbadconnection
+     */
+    get_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string
+    {
+        let low_type = type.toLowerCase()
+        if(low_type == "md5")
+        {
+            return source_str.substring(0, 32)
+        }
+        if(low_type == "data")
+        {
+            return source_str.substring(32)
+        }
+        throw new Error(`fucntion "get_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }
 
     build_sending_msg_md5(): string
