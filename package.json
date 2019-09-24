@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test:base": "tsc && electron-mocha",
-    "test": "yarn test:base test/Encryption_string.js && yarn test:base test/Badbadconnection.js && yarn test:base test/Badbadconnection_encryption.js"
+    "test": "yarn test:base test/Encryption_string.js && yarn test:base test/package_helper.js && yarn test:base test/Badbadconnection.js && yarn test:base test/Badbadconnection_encryption.js"
   },
   "dependencies": {
     "aes-js": "^3.1.2",

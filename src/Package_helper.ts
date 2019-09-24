@@ -1,7 +1,68 @@
 import numeral from "numeral";
+import { Encryption_string } from "./../src/Encryption_string";
+
+export function quick_random_md5(): string
+{
+    let msg_md5: string
+    msg_md5 = Encryption_string.get_md5(String(Math.random()))
+    return msg_md5
+}
+
+export class Data_package
+{
+    sending_package_md5?: string
+    msg_md5?: string
+    total_length?: string | number
+    current_index?: string | number
+    package_data?: string
+}
+
+export class Message_date
+{
+    msg_md5?: string
+    data_package_list: Data_package[]
+    message_content?: string
+
+    constructor()
+    {
+        this.data_package_list = []
+    }
+
+    add_data_package(dp: Data_package)
+    {
+        this.data_package_list.push(dp)
+    }
+}
 
 export class Package_helper
 {
+    message_date_list: Message_date[]
+    
+    constructor()
+    {
+        this.message_date_list = []
+    }
+
+
+    /**
+     * 基于数据包原始数据生成数据包对象
+     *
+     * @static
+     * @param {string} source_str 原始数据
+     * @returns {Data_package}
+     * @memberof Package_helper
+     */
+    static parse_data_package(source_str: string): Data_package
+    {
+        let dp = new Data_package()
+        dp.sending_package_md5 = Package_helper.parse_package_string(source_str, "md5")
+        dp.msg_md5 = Package_helper.parse_package_string(source_str, "msgmd5")
+        dp.total_length = Package_helper.parse_package_string(source_str, "total")
+        dp.current_index = Package_helper.parse_package_string(source_str, "current")
+        dp.package_data = Package_helper.parse_package_string(source_str, "data")
+        return dp
+    }
+
     /**
      * 创建数据包
      *

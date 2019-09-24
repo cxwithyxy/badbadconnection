@@ -1,7 +1,7 @@
 import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
-import { Package_helper } from "./Package_helper";
+import { Package_helper, quick_random_md5 } from "./Package_helper";
 
 export class Badbadconnection
 {
@@ -131,7 +131,7 @@ export class Badbadconnection
     async send(msg:string)
     {
         let msg_for_send = this.try_encode(msg)
-        let msg_md5 = this.build_random_md5()
+        let msg_md5 = quick_random_md5()
         let total_length = msg_for_send.length
         let current_index = 0
         for(;;)
@@ -153,7 +153,7 @@ export class Badbadconnection
         return new Promise(succ =>
         {
             this.send_finish_callback = succ
-            this.sending_package_md5 = this.build_random_md5()
+            this.sending_package_md5 = quick_random_md5()
             let package_for_send = Package_helper.create_package_string(this.sending_package_md5, msg_md5, total_length, current_index, package_data)
             this.wincc.send(this.c_event.main_app_send, package_for_send)
         })
@@ -169,13 +169,6 @@ export class Badbadconnection
     on_recv(_func: (msg: string) => void)
     {
         this.on_resv_func = _func
-    }
-
-    build_random_md5(): string
-    {
-        let msg_md5: string
-        msg_md5 = Encryption_string.get_md5(String(Math.random()))
-        return msg_md5
     }
 
     async close()

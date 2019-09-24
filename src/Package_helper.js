@@ -4,7 +4,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const numeral_1 = __importDefault(require("numeral"));
+class Data_package {
+}
+exports.Data_package = Data_package;
+class Message_date {
+    constructor() {
+        this.data_package_list = [];
+    }
+    add_data_package(dp) {
+        this.data_package_list.push(dp);
+    }
+}
+exports.Message_date = Message_date;
 class Package_helper {
+    constructor() {
+        this.message_date_list = [];
+    }
+    /**
+     * 基于数据包原始数据生成数据包对象
+     *
+     * @static
+     * @param {string} source_str 原始数据
+     * @returns {Data_package}
+     * @memberof Package_helper
+     */
+    static parse_data_package(source_str) {
+        let dp = new Data_package();
+        dp.sending_package_md5 = Package_helper.parse_package_string(source_str, "md5");
+        dp.msg_md5 = Package_helper.parse_package_string(source_str, "msgmd5");
+        dp.total_length = Package_helper.parse_package_string(source_str, "total");
+        dp.current_index = Package_helper.parse_package_string(source_str, "current");
+        dp.package_data = Package_helper.parse_package_string(source_str, "data");
+        return dp;
+    }
     /**
      * 创建数据包
      *

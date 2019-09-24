@@ -1,4 +1,29 @@
+export declare class Data_package {
+    sending_package_md5?: string;
+    msg_md5?: string;
+    total_length?: string | number;
+    current_index?: string | number;
+    package_data?: string;
+}
+export declare class Message_date {
+    msg_md5?: string;
+    data_package_list: Data_package[];
+    message_content?: string;
+    constructor();
+    add_data_package(dp: Data_package): void;
+}
 export declare class Package_helper {
+    message_date_list: Message_date[];
+    constructor();
+    /**
+     * 基于数据包原始数据生成数据包对象
+     *
+     * @static
+     * @param {string} source_str 原始数据
+     * @returns {Data_package}
+     * @memberof Package_helper
+     */
+    static parse_data_package(source_str: string): Data_package;
     /**
      * 创建数据包
      *
