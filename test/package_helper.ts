@@ -16,9 +16,15 @@ describe("Package_helper内各种内容测试", function ()
 
     describe("Package_helper", () =>
     {
-        it("- create_package_string", () =>
+        it("- package_string_making_loop", async () =>
         {
-            // let ps = Package_helper.create_package_string()
+            Package_helper.package_string_making_loop(
+                big_msg,
+                200,
+                async (package_string, package_md5) => {
+                    console.log(package_string);
+                }
+            )
         })
     })
 })

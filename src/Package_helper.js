@@ -4,6 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const numeral_1 = __importDefault(require("numeral"));
+const Encryption_string_1 = require("./../src/Encryption_string");
+function quick_random_md5() {
+    let msg_md5;
+    msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
+    return msg_md5;
+}
+exports.quick_random_md5 = quick_random_md5;
 class Data_package {
 }
 exports.Data_package = Data_package;
@@ -36,6 +43,23 @@ class Package_helper {
         dp.current_index = Package_helper.parse_package_string(source_str, "current");
         dp.package_data = Package_helper.parse_package_string(source_str, "data");
         return dp;
+    }
+    static async package_string_making_loop(msg, package_data_length, loopdo) {
+        let msg_for_send = msg;
+        let msg_md5 = quick_random_md5();
+        let total_length = msg_for_send.length;
+        let current_index = 0;
+        for (;;) {
+            let package_data = msg_for_send.substr(current_index, package_data_length);
+            let package_md5 = quick_random_md5();
+            // console.log(`${current_index}: ${package_data}`);
+            let package_string = Package_helper.create_package_string(package_md5, msg_md5, total_length, current_index, package_data);
+            await loopdo(package_string, package_md5);
+            current_index += package_data_length;
+            if (current_index >= total_length) {
+                break;
+            }
+        }
     }
     /**
      * 创建数据包

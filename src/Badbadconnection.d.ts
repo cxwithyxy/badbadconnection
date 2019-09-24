@@ -46,6 +46,5 @@ export declare class Badbadconnection {
      * @memberof Badbadconnection
      */
     on_recv(_func: (msg: string) => void): void;
-    build_random_md5(): string;
     close(): Promise<void>;
 }

@@ -63,6 +63,28 @@ export class Package_helper
         return dp
     }
 
+    static async package_string_making_loop(msg: string, package_data_length: number, loopdo: (package_string: string, package_md5: string) => Promise<void>)
+    {
+        let msg_for_send = msg
+        let msg_md5 = quick_random_md5()
+        let total_length = msg_for_send.length
+        let current_index = 0
+        for(;;)
+        {
+            let package_data = msg_for_send.substr(current_index, package_data_length)
+            let package_md5 = quick_random_md5()
+            // console.log(`${current_index}: ${package_data}`);
+            let package_string = Package_helper.create_package_string(package_md5, msg_md5, total_length, current_index, package_data)
+            await loopdo(package_string, package_md5)
+            current_index += package_data_length
+            if(current_index >= total_length)
+            {
+                break
+            }
+             
+        }
+    }
+
     /**
      * 创建数据包
      *

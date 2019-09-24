@@ -1,3 +1,4 @@
+export declare function quick_random_md5(): string;
 export declare class Data_package {
     sending_package_md5?: string;
     msg_md5?: string;
@@ -24,6 +25,7 @@ export declare class Package_helper {
      * @memberof Package_helper
      */
     static parse_data_package(source_str: string): Data_package;
+    static package_string_making_loop(msg: string, package_data_length: number, loopdo: (package_string: string, package_md5: string) => Promise<void>): Promise<void>;
     /**
      * 创建数据包
      *
