@@ -143,31 +143,25 @@ class Badbadconnection {
      * 77: 总大小
      * 90: 当前位置
      * end: 数据
-     * 如: 4df663376e76ae4e8d23bc2d9009f1227ebe18faa5952871b457cd219e9c25d500000000001080000000000102vfcgda
-     *
      * @param {string} source_str
-     * @param {("md5" | "total" | "start" | "end" | "data")} type
+     * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
      * @returns {string}
      * @memberof Badbadconnection
      */
     get_package_data(source_str, type) {
-        let low_type = type.toLowerCase();
-        if (low_type == "md5") {
-            return source_str.substring(0, 32);
+        let pointer_dict = {
+            "md5": [0, 32],
+            "msgmd5": [32, 64],
+            "total": [64, 77],
+            "current": [77, 90],
+            "data": [90]
+        };
+        try {
+            return source_str.substring(pointer_dict[type][0], pointer_dict[type][1]);
         }
-        if (low_type == "msgmd5") {
-            return source_str.substring(32, 64);
+        catch (e) {
+            throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
         }
-        if (low_type == "total") {
-            return source_str.substring(64, 77);
-        }
-        if (low_type == "current") {
-            return source_str.substring(77, 90);
-        }
-        if (low_type == "data") {
-            return source_str.substring(90);
-        }
-        throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }
     build_random_md5() {
         let msg_md5;

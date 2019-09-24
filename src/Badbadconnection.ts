@@ -190,28 +190,21 @@ export class Badbadconnection
      */
     get_package_data(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string
     {
-        let low_type = type.toLowerCase()
-        if(low_type == "md5")
-        {
-            return source_str.substring(0, 32)
+        let pointer_dict = {
+            "md5": [0, 32],
+            "msgmd5": [32, 64],
+            "total": [64, 77],
+            "current": [77, 90],
+            "data": [90]
         }
-        if(low_type == "msgmd5")
+        try
         {
-            return source_str.substring(32, 64)
+            return source_str.substring(pointer_dict[type][0], pointer_dict[type][1])
         }
-        if(low_type == "total")
+        catch(e)
         {
-            return source_str.substring(64, 77)
+            throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
         }
-        if(low_type == "current")
-        {
-            return source_str.substring(77, 90)
-        }
-        if(low_type == "data")
-        {
-            return source_str.substring(90)
-        }
-        throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }
 
     build_random_md5(): string
