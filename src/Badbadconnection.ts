@@ -1,6 +1,7 @@
 import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
+import numeral from "numeral";
 
 export class Badbadconnection
 {
@@ -109,7 +110,11 @@ export class Badbadconnection
             {
                 let recv_msg = this.get_package_data(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
-                this.on_resv_func(decode_msg)
+                console.log(this.get_package_data(msg, "msgmd5"))
+                console.log(this.get_package_data(msg, "total"))
+                console.log(this.get_package_data(msg, "current"))
+                console.log(recv_msg)
+                // this.on_resv_func(decode_msg)
             }
         })
         return this
@@ -133,6 +138,7 @@ export class Badbadconnection
         {
             let package_data = msg_for_send.substr(current_index, this.package_data_length)
             console.log(`${current_index}: ${package_data}`);
+            await this.send_package(msg_md5, total_length, current_index, package_data)
             current_index += this.package_data_length
             if(current_index >= total_length)
             {
@@ -148,7 +154,12 @@ export class Badbadconnection
         {
             this.send_finish_callback = succ
             this.sending_package_md5 = this.build_random_md5()
-            let package_for_send = this.sending_package_md5 + package_data
+            let package_for_send = 
+                this.sending_package_md5 + 
+                msg_md5 +
+                numeral(total_length).format("0000000000000") +
+                numeral(current_index).format("0000000000000") +
+                package_data
             this.wincc.send(this.c_event.main_app_send, package_for_send)
         })
     }
@@ -173,20 +184,32 @@ export class Badbadconnection
      * 90: 当前位置
      * end: 数据
      * @param {string} source_str
-     * @param {("md5" | "total" | "start" | "end" | "data")} type
+     * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
      * @returns {string}
      * @memberof Badbadconnection
      */
-    get_package_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string
+    get_package_data(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string
     {
         let low_type = type.toLowerCase()
         if(low_type == "md5")
         {
             return source_str.substring(0, 32)
         }
+        if(low_type == "msgmd5")
+        {
+            return source_str.substring(32, 64)
+        }
+        if(low_type == "total")
+        {
+            return source_str.substring(64, 77)
+        }
+        if(low_type == "current")
+        {
+            return source_str.substring(77, 90)
+        }
         if(low_type == "data")
         {
-            return source_str.substring(32)
+            return source_str.substring(90)
         }
         throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }

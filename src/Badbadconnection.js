@@ -1,7 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const Encryption_string_1 = require("./Encryption_string");
+const numeral_1 = __importDefault(require("numeral"));
 class Badbadconnection {
     /**
      *Creates an instance of Badbadconnection.
@@ -81,7 +85,11 @@ class Badbadconnection {
             else {
                 let recv_msg = this.get_package_data(msg, "data");
                 let decode_msg = this.try_decode(recv_msg);
-                this.on_resv_func(decode_msg);
+                console.log(this.get_package_data(msg, "msgmd5"));
+                console.log(this.get_package_data(msg, "total"));
+                console.log(this.get_package_data(msg, "current"));
+                console.log(recv_msg);
+                // this.on_resv_func(decode_msg)
             }
         });
         return this;
@@ -100,6 +108,7 @@ class Badbadconnection {
         for (;;) {
             let package_data = msg_for_send.substr(current_index, this.package_data_length);
             console.log(`${current_index}: ${package_data}`);
+            await this.send_package(msg_md5, total_length, current_index, package_data);
             current_index += this.package_data_length;
             if (current_index >= total_length) {
                 break;
@@ -110,7 +119,11 @@ class Badbadconnection {
         return new Promise(succ => {
             this.send_finish_callback = succ;
             this.sending_package_md5 = this.build_random_md5();
-            let package_for_send = this.sending_package_md5 + package_data;
+            let package_for_send = this.sending_package_md5 +
+                msg_md5 +
+                numeral_1.default(total_length).format("0000000000000") +
+                numeral_1.default(current_index).format("0000000000000") +
+                package_data;
             this.wincc.send(this.c_event.main_app_send, package_for_send);
         });
     }
@@ -130,6 +143,8 @@ class Badbadconnection {
      * 77: 总大小
      * 90: 当前位置
      * end: 数据
+     * 如: 4df663376e76ae4e8d23bc2d9009f1227ebe18faa5952871b457cd219e9c25d500000000001080000000000102vfcgda
+     *
      * @param {string} source_str
      * @param {("md5" | "total" | "start" | "end" | "data")} type
      * @returns {string}
@@ -140,8 +155,17 @@ class Badbadconnection {
         if (low_type == "md5") {
             return source_str.substring(0, 32);
         }
+        if (low_type == "msgmd5") {
+            return source_str.substring(32, 64);
+        }
+        if (low_type == "total") {
+            return source_str.substring(64, 77);
+        }
+        if (low_type == "current") {
+            return source_str.substring(77, 90);
+        }
         if (low_type == "data") {
-            return source_str.substring(32);
+            return source_str.substring(90);
         }
         throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
     }

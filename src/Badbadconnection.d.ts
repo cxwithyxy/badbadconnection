@@ -53,12 +53,14 @@ export declare class Badbadconnection {
      * 77: 总大小
      * 90: 当前位置
      * end: 数据
+     * 如: 4df663376e76ae4e8d23bc2d9009f1227ebe18faa5952871b457cd219e9c25d500000000001080000000000102vfcgda
+     *
      * @param {string} source_str
      * @param {("md5" | "total" | "start" | "end" | "data")} type
      * @returns {string}
      * @memberof Badbadconnection
      */
-    get_package_data(source_str: string, type: "md5" | "total" | "start" | "end" | "data"): string;
+    get_package_data(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string;
     build_random_md5(): string;
     close(): Promise<void>;
 }
