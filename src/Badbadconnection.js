@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const Encryption_string_1 = require("./Encryption_string");
-const numeral_1 = __importDefault(require("numeral"));
+const Package_helper_1 = require("./Package_helper");
 class Badbadconnection {
     /**
      *Creates an instance of Badbadconnection.
@@ -75,7 +72,7 @@ class Badbadconnection {
             })()
         `);
         electron_1.ipcMain.on(this.c_event.main_app_recv, (e, msg) => {
-            let package_md5 = this.get_package_data(msg, "md5");
+            let package_md5 = Package_helper_1.Package_helper.parse_package(msg, "md5");
             if (package_md5 == this.sending_package_md5) {
                 if (this.send_finish_callback) {
                     this.send_finish_callback();
@@ -83,11 +80,11 @@ class Badbadconnection {
                 }
             }
             else {
-                let recv_msg = this.get_package_data(msg, "data");
+                let recv_msg = Package_helper_1.Package_helper.parse_package(msg, "data");
                 let decode_msg = this.try_decode(recv_msg);
-                console.log(this.get_package_data(msg, "msgmd5"));
-                console.log(this.get_package_data(msg, "total"));
-                console.log(this.get_package_data(msg, "current"));
+                console.log(Package_helper_1.Package_helper.parse_package(msg, "msgmd5"));
+                console.log(Package_helper_1.Package_helper.parse_package(msg, "total"));
+                console.log(Package_helper_1.Package_helper.parse_package(msg, "current"));
                 console.log(recv_msg);
                 // this.on_resv_func(decode_msg)
             }
@@ -119,11 +116,7 @@ class Badbadconnection {
         return new Promise(succ => {
             this.send_finish_callback = succ;
             this.sending_package_md5 = this.build_random_md5();
-            let package_for_send = this.sending_package_md5 +
-                msg_md5 +
-                numeral_1.default(total_length).format("0000000000000") +
-                numeral_1.default(current_index).format("0000000000000") +
-                package_data;
+            let package_for_send = Package_helper_1.Package_helper.create_package(this.sending_package_md5, msg_md5, total_length, current_index, package_data);
             this.wincc.send(this.c_event.main_app_send, package_for_send);
         });
     }
@@ -135,34 +128,6 @@ class Badbadconnection {
      */
     on_recv(_func) {
         this.on_resv_func = _func;
-    }
-    /**
-     * 解析数据包
-     *
-     * @param {string} source_str
-     * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
-     * md5: 当前数据包md5标识
-     * msgmd5: 数据整体的md5标识
-     * total: 总数据大小
-     * current: 当前数据开始位置
-     * data: 数据包所带数据
-     * @returns {string}
-     * @memberof Badbadconnection
-     */
-    get_package_data(source_str, type) {
-        let pointer_dict = {
-            "md5": [0, 32],
-            "msgmd5": [32, 64],
-            "total": [64, 77],
-            "current": [77, 90],
-            "data": [90]
-        };
-        try {
-            return source_str.substring(pointer_dict[type][0], pointer_dict[type][1]);
-        }
-        catch (e) {
-            throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
-        }
     }
     build_random_md5() {
         let msg_md5;

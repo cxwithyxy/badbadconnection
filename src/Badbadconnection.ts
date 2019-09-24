@@ -1,7 +1,7 @@
 import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
-import numeral from "numeral";
+import { Package_helper } from "./Package_helper";
 
 export class Badbadconnection
 {
@@ -97,7 +97,7 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let package_md5 = this.get_package_data(msg, "md5")
+            let package_md5 = Package_helper.parse_package(msg, "md5")
             if(package_md5 == this.sending_package_md5)
             {
                 if(this.send_finish_callback)
@@ -108,11 +108,11 @@ export class Badbadconnection
             }
             else
             {
-                let recv_msg = this.get_package_data(msg, "data")
+                let recv_msg = Package_helper.parse_package(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
-                console.log(this.get_package_data(msg, "msgmd5"))
-                console.log(this.get_package_data(msg, "total"))
-                console.log(this.get_package_data(msg, "current"))
+                console.log(Package_helper.parse_package(msg, "msgmd5"))
+                console.log(Package_helper.parse_package(msg, "total"))
+                console.log(Package_helper.parse_package(msg, "current"))
                 console.log(recv_msg)
                 // this.on_resv_func(decode_msg)
             }
@@ -148,18 +148,13 @@ export class Badbadconnection
         }
     }
 
-    async send_package(msg_md5: string, total_length: number, current_index: number, package_data: string, )
+    async send_package(msg_md5: string, total_length: number, current_index: number, package_data: string )
     {
         return new Promise(succ =>
         {
             this.send_finish_callback = succ
             this.sending_package_md5 = this.build_random_md5()
-            let package_for_send = 
-                this.sending_package_md5 + 
-                msg_md5 +
-                numeral(total_length).format("0000000000000") +
-                numeral(current_index).format("0000000000000") +
-                package_data
+            let package_for_send = Package_helper.create_package(this.sending_package_md5, msg_md5, total_length, current_index, package_data)
             this.wincc.send(this.c_event.main_app_send, package_for_send)
         })
     }
@@ -174,38 +169,6 @@ export class Badbadconnection
     on_recv(_func: (msg: string) => void)
     {
         this.on_resv_func = _func
-    }
-
-    /**
-     * 解析数据包
-     * 
-     * @param {string} source_str
-     * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
-     * md5: 当前数据包md5标识
-     * msgmd5: 数据整体的md5标识
-     * total: 总数据大小
-     * current: 当前数据开始位置
-     * data: 数据包所带数据
-     * @returns {string}
-     * @memberof Badbadconnection
-     */
-    get_package_data(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string
-    {
-        let pointer_dict = {
-            "md5": [0, 32],
-            "msgmd5": [32, 64],
-            "total": [64, 77],
-            "current": [77, 90],
-            "data": [90]
-        }
-        try
-        {
-            return source_str.substring(pointer_dict[type][0], pointer_dict[type][1])
-        }
-        catch(e)
-        {
-            throw new Error(`fucntion "get_package_data" get something wrong, check those argus: source_str ${source_str}, type ${type}`);
-        }
     }
 
     build_random_md5(): string

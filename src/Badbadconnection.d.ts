@@ -46,20 +46,6 @@ export declare class Badbadconnection {
      * @memberof Badbadconnection
      */
     on_recv(_func: (msg: string) => void): void;
-    /**
-     * 解析数据包
-     *
-     * @param {string} source_str
-     * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
-     * md5: 当前数据包md5标识
-     * msgmd5: 数据整体的md5标识
-     * total: 总数据大小
-     * current: 当前数据开始位置
-     * data: 数据包所带数据
-     * @returns {string}
-     * @memberof Badbadconnection
-     */
-    get_package_data(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string;
     build_random_md5(): string;
     close(): Promise<void>;
 }
