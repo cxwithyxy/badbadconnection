@@ -48,13 +48,14 @@ export declare class Badbadconnection {
     on_recv(_func: (msg: string) => void): void;
     /**
      * 解析数据包
-     * 32: md5
-     * 64: 信息识别码
-     * 77: 总大小
-     * 90: 当前位置
-     * end: 数据
+     *
      * @param {string} source_str
      * @param {("md5" | "msgmd5" | "total" | "current" | "data")} type
+     * md5: 当前数据包md5标识
+     * msgmd5: 数据整体的md5标识
+     * total: 总数据大小
+     * current: 当前数据开始位置
+     * data: 数据包所带数据
      * @returns {string}
      * @memberof Badbadconnection
      */
