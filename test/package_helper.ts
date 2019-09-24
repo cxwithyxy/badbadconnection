@@ -15,7 +15,7 @@ describe("Package_helper内各种内容测试", function ()
         }
     }
 
-    describe("Package_helper", () =>
+    describe("Package_helper static function", () =>
     {
         it("- parse_package_string", () =>
         {
@@ -48,6 +48,26 @@ describe("Package_helper内各种内容测试", function ()
             should(test_data_package.total_length).be.Number().equal(total_number)
             should(test_data_package.current_index).be.Number().equal(current_numebr)
             should(test_data_package.package_data).be.String().equal(data)
+        })
+
+        it("- create_package_string", () =>
+        {
+            let p_md5 = "qwerqwerqwerqwerqwerqwerqwerqwer"
+            let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let total = "0000000000200"
+            let total_number = 200
+            let current = "0000000000120"
+            let current_numebr = 120
+            let data = "datadatadatadata"
+            let test_package_string = [p_md5, msgmd5, total, current, data].join("")
+            let test = Package_helper.create_package_string(
+                p_md5,
+                msgmd5,
+                total_number,
+                current_numebr,
+                data
+            )
+            should(test).be.String().equal(test_package_string)
         })
 
         it("- package_string_making_loop", async () =>
