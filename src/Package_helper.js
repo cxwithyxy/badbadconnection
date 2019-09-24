@@ -17,7 +17,7 @@ class Package_helper {
      * @returns {string}
      * @memberof Package_helper
      */
-    static create_package(sending_package_md5, msg_md5, total_length, current_index, package_data) {
+    static create_package_string(sending_package_md5, msg_md5, total_length, current_index, package_data) {
         let package_for_send = sending_package_md5 +
             msg_md5 +
             numeral_1.default(total_length).format("0000000000000") +
@@ -39,7 +39,7 @@ class Package_helper {
      * @returns {string}
      * @memberof Package_helper
      */
-    static parse_package(source_str, type) {
+    static parse_package_string(source_str, type) {
         let pointer_dict = {
             "md5": [0, 32],
             "msgmd5": [32, 64],

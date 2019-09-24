@@ -97,7 +97,7 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let package_md5 = Package_helper.parse_package(msg, "md5")
+            let package_md5 = Package_helper.parse_package_string(msg, "md5")
             if(package_md5 == this.sending_package_md5)
             {
                 if(this.send_finish_callback)
@@ -108,11 +108,11 @@ export class Badbadconnection
             }
             else
             {
-                let recv_msg = Package_helper.parse_package(msg, "data")
+                let recv_msg = Package_helper.parse_package_string(msg, "data")
                 let decode_msg = this.try_decode(recv_msg)
-                console.log(Package_helper.parse_package(msg, "msgmd5"))
-                console.log(Package_helper.parse_package(msg, "total"))
-                console.log(Package_helper.parse_package(msg, "current"))
+                console.log(Package_helper.parse_package_string(msg, "msgmd5"))
+                console.log(Package_helper.parse_package_string(msg, "total"))
+                console.log(Package_helper.parse_package_string(msg, "current"))
                 console.log(recv_msg)
                 // this.on_resv_func(decode_msg)
             }
@@ -154,7 +154,7 @@ export class Badbadconnection
         {
             this.send_finish_callback = succ
             this.sending_package_md5 = this.build_random_md5()
-            let package_for_send = Package_helper.create_package(this.sending_package_md5, msg_md5, total_length, current_index, package_data)
+            let package_for_send = Package_helper.create_package_string(this.sending_package_md5, msg_md5, total_length, current_index, package_data)
             this.wincc.send(this.c_event.main_app_send, package_for_send)
         })
     }

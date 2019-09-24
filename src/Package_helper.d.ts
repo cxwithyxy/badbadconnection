@@ -11,7 +11,7 @@ export declare class Package_helper {
      * @returns {string}
      * @memberof Package_helper
      */
-    static create_package(sending_package_md5: string, msg_md5: string, total_length: number, current_index: number, package_data: string): string;
+    static create_package_string(sending_package_md5: string, msg_md5: string, total_length: number, current_index: number, package_data: string): string;
     /**
      * 解析数据包
      *
@@ -26,5 +26,5 @@ export declare class Package_helper {
      * @returns {string}
      * @memberof Package_helper
      */
-    static parse_package(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string;
+    static parse_package_string(source_str: string, type: "md5" | "msgmd5" | "total" | "current" | "data"): string;
 }
