@@ -12,8 +12,8 @@ export class Data_package
 {
     sending_package_md5?: string
     msg_md5?: string
-    total_length?: string | number
-    current_index?: string | number
+    total_length?: number
+    current_index?: number
     package_data?: string
 }
 
@@ -57,8 +57,8 @@ export class Package_helper
         let dp = new Data_package()
         dp.sending_package_md5 = Package_helper.parse_package_string(source_str, "md5")
         dp.msg_md5 = Package_helper.parse_package_string(source_str, "msgmd5")
-        dp.total_length = Package_helper.parse_package_string(source_str, "total")
-        dp.current_index = Package_helper.parse_package_string(source_str, "current")
+        dp.total_length = Number(Package_helper.parse_package_string(source_str, "total"))
+        dp.current_index = Number(Package_helper.parse_package_string(source_str, "current"))
         dp.package_data = Package_helper.parse_package_string(source_str, "data")
         return dp
     }

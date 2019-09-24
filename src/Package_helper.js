@@ -39,8 +39,8 @@ class Package_helper {
         let dp = new Data_package();
         dp.sending_package_md5 = Package_helper.parse_package_string(source_str, "md5");
         dp.msg_md5 = Package_helper.parse_package_string(source_str, "msgmd5");
-        dp.total_length = Package_helper.parse_package_string(source_str, "total");
-        dp.current_index = Package_helper.parse_package_string(source_str, "current");
+        dp.total_length = Number(Package_helper.parse_package_string(source_str, "total"));
+        dp.current_index = Number(Package_helper.parse_package_string(source_str, "current"));
         dp.package_data = Package_helper.parse_package_string(source_str, "data");
         return dp;
     }

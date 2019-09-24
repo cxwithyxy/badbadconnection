@@ -2,8 +2,8 @@ export declare function quick_random_md5(): string;
 export declare class Data_package {
     sending_package_md5?: string;
     msg_md5?: string;
-    total_length?: string | number;
-    current_index?: string | number;
+    total_length?: number;
+    current_index?: number;
     package_data?: string;
 }
 export declare class Message_date {
