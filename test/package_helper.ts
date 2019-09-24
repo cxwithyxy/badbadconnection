@@ -3,18 +3,6 @@ import should from "should";
 
 describe("Package_helper内各种内容测试", function ()
 {
-    let max_msg_length = 1000
-    let big_msg: string
-    big_msg = ""
-    for(;;)
-    {
-        big_msg += String(Math.random()*10e3)
-        if(big_msg.length > max_msg_length)
-        {
-            break
-        }
-    }
-
     describe("Package_helper static function", () =>
     {
         it("- parse_package_string", () =>
@@ -72,11 +60,29 @@ describe("Package_helper内各种内容测试", function ()
 
         it("- package_string_making_loop", async () =>
         {
+            let max_msg_length = 1000
+            let big_msg: string
+            big_msg = ""
+            for(;;)
+            {
+                big_msg += String(Math.random()*10e3)
+                if(big_msg.length > max_msg_length)
+                {
+                    break
+                }
+            }
             await Package_helper.package_string_making_loop(
                 big_msg,
                 200,
-                async (package_string, package_md5) => {
-                    // console.log(package_string);
+                async (package_string:string , package_md5: string) => {
+                    should(package_md5.length).be.equal(32)
+                    let temp_data_package = Package_helper.parse_data_package(package_string)
+                    should(temp_data_package.total_length).equal(big_msg.length)
+                    should((<string>temp_data_package.package_data).length).lessThanOrEqual(200)
+                    let data_position = big_msg.indexOf(<string>temp_data_package.package_data)
+                    should(data_position).not.equal(-1)
+                    should(data_position).equal(temp_data_package.current_index)
+                    should(<number>temp_data_package.current_index % 200).equal(0)
                 }
             )
         })
