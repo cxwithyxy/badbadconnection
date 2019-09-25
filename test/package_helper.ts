@@ -1,4 +1,4 @@
-import { Package_helper } from "./../src/Package_helper";
+import { Package_helper, Message_data } from "./../src/Package_helper";
 import should from "should";
 
 describe("Package_helper内各种内容测试", function ()
@@ -85,6 +85,31 @@ describe("Package_helper内各种内容测试", function ()
                     should(<number>temp_data_package.current_index % 200).equal(0)
                 }
             )
+        })
+    })
+
+    describe("Package_helper instance function", () =>
+    {
+        it("- find_message_data_index", () =>
+        {
+            let ph = new Package_helper()
+            let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let wrong_msgmd5 = "ghjkghjkghjkghjkghjkghjkghjkghjk"
+            ph.message_data_list = [new Message_data(msgmd5)]
+            let index = ph.find_message_data_index(msgmd5)
+            should(index).equal(0)
+            index = ph.find_message_data_index(wrong_msgmd5)
+            should(index).equal(-1)
+        })
+
+        it("- setup_message_data", () =>
+        {
+            let ph = new Package_helper()
+            let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let message_data = ph.setup_message_data(msgmd5)
+            should(message_data.msg_md5).equal(msgmd5)
+            should(ph.message_data_list.length).equal(1)
+            should(ph.setup_message_data(msgmd5).msg_md5).equal(msgmd5)
         })
     })
 })

@@ -6,16 +6,18 @@ export declare class Data_package {
     current_index?: number;
     package_data?: string;
 }
-export declare class Message_date {
-    msg_md5?: string;
+export declare class Message_data {
+    msg_md5: string;
     data_package_list: Data_package[];
     message_content?: string;
-    constructor();
+    constructor(msg_md5: string);
     add_data_package(dp: Data_package): void;
 }
 export declare class Package_helper {
-    message_date_list: Message_date[];
+    message_data_list: Message_data[];
     constructor();
+    find_message_data_index(msg_md5: string): number;
+    setup_message_data(msg_md5: string): Message_data;
     /**
      * 基于数据包原始数据生成数据包对象
      *

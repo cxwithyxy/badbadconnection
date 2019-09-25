@@ -1,5 +1,6 @@
 import numeral from "numeral";
 import { Encryption_string } from "./../src/Encryption_string";
+import _ from "lodash";
 
 export function quick_random_md5(): string
 {
@@ -17,14 +18,15 @@ export class Data_package
     package_data?: string
 }
 
-export class Message_date
+export class Message_data
 {
-    msg_md5?: string
+    msg_md5: string
     data_package_list: Data_package[]
     message_content?: string
 
-    constructor()
+    constructor(msg_md5: string)
     {
+        this.msg_md5 = msg_md5
         this.data_package_list = []
     }
 
@@ -36,11 +38,32 @@ export class Message_date
 
 export class Package_helper
 {
-    message_date_list: Message_date[]
+    message_data_list: Message_data[]
     
     constructor()
     {
-        this.message_date_list = []
+        this.message_data_list = []
+    }
+
+    find_message_data_index(msg_md5: string): number
+    {
+        let index = _.findIndex(this.message_data_list, message_data =>
+        {
+            return message_data.msg_md5 == msg_md5
+        })
+        return index
+    }
+
+    setup_message_data(msg_md5: string): Message_data
+    {
+        let index = this.find_message_data_index(msg_md5)
+        if(index == -1)
+        {
+            let message_data = new Message_data(msg_md5)
+            this.message_data_list.push(message_data)
+            return message_data
+        }
+        return this.message_data_list[index]
     }
 
 

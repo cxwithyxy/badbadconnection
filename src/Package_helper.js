@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const numeral_1 = __importDefault(require("numeral"));
 const Encryption_string_1 = require("./../src/Encryption_string");
+const lodash_1 = __importDefault(require("lodash"));
 function quick_random_md5() {
     let msg_md5;
     msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
@@ -14,18 +15,34 @@ exports.quick_random_md5 = quick_random_md5;
 class Data_package {
 }
 exports.Data_package = Data_package;
-class Message_date {
-    constructor() {
+class Message_data {
+    constructor(msg_md5) {
+        this.msg_md5 = msg_md5;
         this.data_package_list = [];
     }
     add_data_package(dp) {
         this.data_package_list.push(dp);
     }
 }
-exports.Message_date = Message_date;
+exports.Message_data = Message_data;
 class Package_helper {
     constructor() {
-        this.message_date_list = [];
+        this.message_data_list = [];
+    }
+    find_message_data_index(msg_md5) {
+        let index = lodash_1.default.findIndex(this.message_data_list, message_data => {
+            return message_data.msg_md5 == msg_md5;
+        });
+        return index;
+    }
+    setup_message_data(msg_md5) {
+        let index = this.find_message_data_index(msg_md5);
+        if (index == -1) {
+            let message_data = new Message_data(msg_md5);
+            this.message_data_list.push(message_data);
+            return message_data;
+        }
+        return this.message_data_list[index];
     }
     /**
      * 基于数据包原始数据生成数据包对象

@@ -7,6 +7,11 @@
   resolved "https://registry.npm.taobao.org/@types/aes-js/download/@types/aes-js-3.1.0.tgz#28175b1be1a4df371098b25f94aac35a4c02bfa7"
   integrity sha1-KBdbG+Gk3zcQmLJflKrDWkwCv6c=
 
+"@types/lodash@^4.14.139":
+  version "4.14.139"
+  resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.139.tgz#b7b8a00d014a7debb29dc2dae4f91d3d3c6d5ab3"
+  integrity sha1-t7igDQFKfeuyncLa5PkdPTxtWrM=
+
 "@types/mocha@^5.2.7":
   version "5.2.7"
   resolved "https://registry.npm.taobao.org/@types/mocha/download/@types/mocha-5.2.7.tgz#315d570ccb56c53452ff8638738df60726d5b6ea"
@@ -938,7 +943,7 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
-lodash@^4.17.11:
+lodash@^4.17.11, lodash@^4.17.15:
   version "4.17.15"
   resolved "https://registry.npm.taobao.org/lodash/download/lodash-4.17.15.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha1-tEf2ZwoEVbv+7dETku/zMOoJdUg=
