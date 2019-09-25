@@ -2,6 +2,8 @@ import numeral from "numeral";
 import { Encryption_string } from "./../src/Encryption_string";
 import _ from "lodash";
 
+export class DATA_PACKAGE_AREADY_EXISTS extends Error{}
+
 export function quick_random_md5(): string
 {
     let msg_md5: string
@@ -30,8 +32,22 @@ export class Message_data
         this.data_package_list = []
     }
 
+    find_data_package_index(package_md5: string)
+    {
+        let index = _.findIndex(this.data_package_list, data_package =>
+        {
+            return data_package.sending_package_md5 == package_md5
+        })
+        return index
+    }
+
     add_data_package(dp: Data_package)
     {
+        let index = this.find_data_package_index(<string>dp.sending_package_md5)
+        if(index != -1)
+        {
+            throw new DATA_PACKAGE_AREADY_EXISTS(`package_md5: ${dp.sending_package_md5}`)
+        }
         this.data_package_list.push(dp)
     }
 }
@@ -64,6 +80,13 @@ export class Package_helper
             return message_data
         }
         return this.message_data_list[index]
+    }
+
+    add_source_str_to_message_data(msg_md5: string, source_str: string)
+    {
+        let message_data = this.setup_message_data(msg_md5)
+        let data_package = Package_helper.parse_data_package(source_str)
+        message_data.add_data_package(data_package)
     }
 
 

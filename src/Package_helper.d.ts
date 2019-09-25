@@ -1,3 +1,5 @@
+export declare class DATA_PACKAGE_AREADY_EXISTS extends Error {
+}
 export declare function quick_random_md5(): string;
 export declare class Data_package {
     sending_package_md5?: string;
@@ -11,6 +13,7 @@ export declare class Message_data {
     data_package_list: Data_package[];
     message_content?: string;
     constructor(msg_md5: string);
+    find_data_package_index(package_md5: string): number;
     add_data_package(dp: Data_package): void;
 }
 export declare class Package_helper {
@@ -18,6 +21,7 @@ export declare class Package_helper {
     constructor();
     find_message_data_index(msg_md5: string): number;
     setup_message_data(msg_md5: string): Message_data;
+    add_source_str_to_message_data(msg_md5: string, source_str: string): void;
     /**
      * 基于数据包原始数据生成数据包对象
      *

@@ -1,4 +1,4 @@
-import { Package_helper, Message_data, quick_random_md5 } from "./../src/Package_helper";
+import { Package_helper, Message_data, quick_random_md5, Data_package, DATA_PACKAGE_AREADY_EXISTS } from "./../src/Package_helper";
 import should from "should";
 import _ from "lodash";
 
@@ -18,6 +18,7 @@ describe("Package_helper内各种内容测试", function ()
         should(test_list.length).equal(random_md5_list.length)
         
     })
+    
     describe("Package_helper static function", () =>
     {
         it("- parse_package_string", () =>
@@ -100,6 +101,53 @@ describe("Package_helper内各种内容测试", function ()
                     should(<number>temp_data_package.current_index % 200).equal(0)
                 }
             )
+        })
+    })
+
+    describe("Message_data instance function", () =>
+    {
+        it("- find_data_package_index", () =>
+        {
+            let data_package = new Data_package()
+            data_package.sending_package_md5 = "qwerqwerqwerqwerqwerqwerqwerqwer"
+            data_package.msg_md5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let total = "0000000000200"
+            data_package.total_length = 200
+            let current = "0000000000120"
+            data_package.current_index = 120
+            data_package.package_data = "datadatadatadata"
+            let message_data = new Message_data(data_package.msg_md5)
+            let index = message_data.find_data_package_index(data_package.sending_package_md5)
+            should(index).equal(-1)
+            message_data.data_package_list.push(data_package)
+            index = message_data.find_data_package_index(data_package.sending_package_md5)
+            should(index).equal(0)
+        })
+
+        it("- add_data_package", () =>
+        {
+            let data_package = new Data_package()
+            data_package.sending_package_md5 = "qwerqwerqwerqwerqwerqwerqwerqwer"
+            data_package.msg_md5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let total = "0000000000200"
+            data_package.total_length = 200
+            let current = "0000000000120"
+            data_package.current_index = 120
+            data_package.package_data = "datadatadatadata"
+            let message_data = new Message_data(data_package.msg_md5)
+            let index = message_data.find_data_package_index(data_package.sending_package_md5)
+            should(index).equal(-1)
+            message_data.add_data_package(data_package)
+            index = message_data.find_data_package_index(data_package.sending_package_md5)
+            should(index).equal(0)
+            try
+            {
+                message_data.add_data_package(data_package)
+            }
+            catch(e)
+            {
+                should(e instanceof DATA_PACKAGE_AREADY_EXISTS).equal(true)
+            }
         })
     })
 

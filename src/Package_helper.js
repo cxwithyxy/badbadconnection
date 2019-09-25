@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const numeral_1 = __importDefault(require("numeral"));
 const Encryption_string_1 = require("./../src/Encryption_string");
 const lodash_1 = __importDefault(require("lodash"));
+class DATA_PACKAGE_AREADY_EXISTS extends Error {
+}
+exports.DATA_PACKAGE_AREADY_EXISTS = DATA_PACKAGE_AREADY_EXISTS;
 function quick_random_md5() {
     let msg_md5;
     msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
@@ -20,7 +23,17 @@ class Message_data {
         this.msg_md5 = msg_md5;
         this.data_package_list = [];
     }
+    find_data_package_index(package_md5) {
+        let index = lodash_1.default.findIndex(this.data_package_list, data_package => {
+            return data_package.sending_package_md5 == package_md5;
+        });
+        return index;
+    }
     add_data_package(dp) {
+        let index = this.find_data_package_index(dp.sending_package_md5);
+        if (index != -1) {
+            throw new DATA_PACKAGE_AREADY_EXISTS(`package_md5: ${dp.sending_package_md5}`);
+        }
         this.data_package_list.push(dp);
     }
 }
@@ -43,6 +56,11 @@ class Package_helper {
             return message_data;
         }
         return this.message_data_list[index];
+    }
+    add_source_str_to_message_data(msg_md5, source_str) {
+        let message_data = this.setup_message_data(msg_md5);
+        let data_package = Package_helper.parse_data_package(source_str);
+        message_data.add_data_package(data_package);
     }
     /**
      * 基于数据包原始数据生成数据包对象
