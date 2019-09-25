@@ -1,8 +1,23 @@
-import { Package_helper, Message_data } from "./../src/Package_helper";
+import { Package_helper, Message_data, quick_random_md5 } from "./../src/Package_helper";
 import should from "should";
+import _ from "lodash";
 
 describe("Package_helper内各种内容测试", function ()
 {
+    it("- quick_random_md5", () =>
+    {
+        let random_md5_list = []
+        let loop_count = 1000
+        for(;;)
+        {
+            random_md5_list.push(quick_random_md5())
+            loop_count --
+            if(loop_count < 0) break
+        }
+        let test_list = _.uniq(random_md5_list)
+        should(test_list.length).equal(random_md5_list.length)
+        
+    })
     describe("Package_helper static function", () =>
     {
         it("- parse_package_string", () =>
