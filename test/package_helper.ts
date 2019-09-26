@@ -19,7 +19,7 @@ describe("Package_helper内各种内容测试", function ()
         
     })
     
-    describe("Package_helper static function", () =>
+    describe("# Package_helper static function", () =>
     {
         it("- parse_package_string", () =>
         {
@@ -104,7 +104,7 @@ describe("Package_helper内各种内容测试", function ()
         })
     })
 
-    describe("Message_data instance function", () =>
+    describe("# Message_data instance function", () =>
     {
         it("- find_data_package_index", () =>
         {
@@ -151,7 +151,7 @@ describe("Package_helper内各种内容测试", function ()
         })
     })
 
-    describe("Package_helper instance function", () =>
+    describe("# Package_helper instance function", () =>
     {
         it("- find_message_data_index", () =>
         {

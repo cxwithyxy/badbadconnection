@@ -32,6 +32,11 @@ export class Message_data
         this.data_package_list = []
     }
 
+    find_data_package(filter: {sending_package_md5?: string, current_index?: number}): Data_package
+    {
+        
+    }
+
     find_data_package_index(package_md5: string)
     {
         let index = _.findIndex(this.data_package_list, data_package =>
