@@ -93,9 +93,18 @@ describe("Badbadconnection", function ()
         //     should(b2_recv).equal(b1_send)
         // })
 
-        it("大数据发送", async () =>
+        it("大数据发送", () =>
         {
-            await b1.send("cdjklxbdsjklfgilhqwegbicxfaskdlnmhasgdk,xmihnbrhvbegaeycbdhasbyeuaghlcmnashmeckabnsecaegfashcbvfeasghevfcgda")
+            let long_text = "cdjklxbdsjklfgilhqwegbicxfaskdlnmhasgdk,xmihnbrhvbegaeycbdhasbyeuaghlcmnashmeckabnsecaegfashcbvfeasghevfcgda"
+            return new Promise(async succ =>
+            {
+                b2.on_recv((msg: string) =>
+                {
+                    should(msg).equal(long_text)
+                    succ()
+                })
+                await b1.send(long_text)
+            })
         })
     })
 

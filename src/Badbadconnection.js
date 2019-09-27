@@ -31,6 +31,7 @@ class Badbadconnection {
         });
         this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
+        this.package_container = new Package_helper_1.Package_helper();
     }
     event_name_init() {
         this.c_event = {
@@ -79,15 +80,10 @@ class Badbadconnection {
                     this.send_finish_callback = undefined;
                 }
             }
-            else {
-                let recv_msg = Package_helper_1.Package_helper.parse_package_string(msg, "data");
-                let decode_msg = this.try_decode(recv_msg);
-                console.log(Package_helper_1.Package_helper.parse_package_string(msg, "msgmd5"));
-                console.log(Package_helper_1.Package_helper.parse_package_string(msg, "total"));
-                console.log(Package_helper_1.Package_helper.parse_package_string(msg, "current"));
-                console.log(recv_msg);
-                // this.on_resv_func(decode_msg)
-            }
+            this.package_container.add_source_str_to_message_data(msg);
+        });
+        this.package_container.on("message_finish", (m_d) => {
+            this.on_resv_func(this.try_decode(m_d.get_message_content()));
         });
         return this;
     }
@@ -99,25 +95,15 @@ class Badbadconnection {
      */
     async send(msg) {
         let msg_for_send = this.try_encode(msg);
-        let msg_md5 = Package_helper_1.quick_random_md5();
-        let total_length = msg_for_send.length;
-        let current_index = 0;
-        for (;;) {
-            let package_data = msg_for_send.substr(current_index, this.package_data_length);
-            console.log(`${current_index}: ${package_data}`);
-            await this.send_package(msg_md5, total_length, current_index, package_data);
-            current_index += this.package_data_length;
-            if (current_index >= total_length) {
-                break;
-            }
-        }
+        await Package_helper_1.Package_helper.package_string_making_loop(msg_for_send, 13, async (package_string, package_md5) => {
+            await this.send_package(package_md5, package_string);
+        });
     }
-    async send_package(msg_md5, total_length, current_index, package_data) {
+    async send_package(package_md5, package_data) {
         return new Promise(succ => {
             this.send_finish_callback = succ;
-            this.sending_package_md5 = Package_helper_1.quick_random_md5();
-            let package_for_send = Package_helper_1.Package_helper.create_package_string(this.sending_package_md5, msg_md5, total_length, current_index, package_data);
-            this.wincc.send(this.c_event.main_app_send, package_for_send);
+            this.sending_package_md5 = package_md5;
+            this.wincc.send(this.c_event.main_app_send, package_data);
         });
     }
     /**
