@@ -67,7 +67,6 @@ export class Message_data
                 {
                     this.message_content = message_content
                     return message_content
-                    break
                 }
                 throw e
             }
@@ -153,10 +152,10 @@ export class Package_helper
         return this.message_data_list[index]
     }
 
-    add_source_str_to_message_data(msg_md5: string, source_str: string)
+    add_source_str_to_message_data(source_str: string)
     {
-        let message_data = this.setup_message_data(msg_md5)
         let data_package = Package_helper.parse_data_package(source_str)
+        let message_data = this.setup_message_data(<string>data_package.msg_md5)
         message_data.add_data_package(data_package)
     }
 

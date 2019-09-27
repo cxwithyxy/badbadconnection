@@ -293,5 +293,31 @@ describe("Package_helper内各种内容测试", function ()
             should(ph.message_data_list.length).equal(1)
             should(ph.setup_message_data(msgmd5).msg_md5).equal(msgmd5)
         })
+
+        it("- add_source_str_to_message_data", async () =>
+        {
+            let ph = new Package_helper()
+            let max_msg_length = 999
+            let big_msg: string
+            big_msg = ""
+            for(;;)
+            {
+                big_msg += String(Math.random()*10e3)
+                if(big_msg.length > max_msg_length)
+                {
+                    break
+                }
+            }
+            await Package_helper.package_string_making_loop(
+                big_msg,
+                193,
+                async (package_string:string , package_md5: string) =>
+                {
+                    ph.add_source_str_to_message_data(package_string)
+                }
+            )
+            let temp_msg = ph.message_data_list[0].get_message_content()
+            should(temp_msg).equal(big_msg)
+        })
     })
 })

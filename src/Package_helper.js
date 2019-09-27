@@ -52,7 +52,6 @@ class Message_data {
                 if (e instanceof DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA) {
                     this.message_content = message_content;
                     return message_content;
-                    break;
                 }
                 throw e;
             }
@@ -113,9 +112,9 @@ class Package_helper {
         }
         return this.message_data_list[index];
     }
-    add_source_str_to_message_data(msg_md5, source_str) {
-        let message_data = this.setup_message_data(msg_md5);
+    add_source_str_to_message_data(source_str) {
         let data_package = Package_helper.parse_data_package(source_str);
+        let message_data = this.setup_message_data(data_package.msg_md5);
         message_data.add_data_package(data_package);
     }
     /**

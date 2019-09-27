@@ -32,7 +32,7 @@ export declare class Package_helper {
     constructor();
     find_message_data_index(msg_md5: string): number;
     setup_message_data(msg_md5: string): Message_data;
-    add_source_str_to_message_data(msg_md5: string, source_str: string): void;
+    add_source_str_to_message_data(source_str: string): void;
     /**
      * 基于数据包原始数据生成数据包对象
      *
