@@ -80,7 +80,9 @@ class Badbadconnection {
                     this.send_finish_callback = undefined;
                 }
             }
-            this.package_container.add_source_str_to_message_data(msg);
+            else {
+                this.package_container.add_source_str_to_message_data(msg);
+            }
         });
         this.package_container.on("message_finish", (m_d) => {
             this.on_resv_func(this.try_decode(m_d.get_message_content()));
