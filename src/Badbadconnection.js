@@ -12,7 +12,7 @@ class Badbadconnection {
     constructor(channel, encryption = false) {
         this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
         this.encryption_string = false;
-        this.package_data_length = 6;
+        this.package_data_length = 1300;
         this.sending_package_md5 = "";
         this.event_name_init();
         if (encryption) {
@@ -95,7 +95,7 @@ class Badbadconnection {
      */
     async send(msg) {
         let msg_for_send = this.try_encode(msg);
-        await Package_helper_1.Package_helper.package_string_making_loop(msg_for_send, 13, async (package_string, package_md5) => {
+        await Package_helper_1.Package_helper.package_string_making_loop(msg_for_send, this.package_data_length, async (package_string, package_md5) => {
             await this.send_package(package_md5, package_string);
         });
     }

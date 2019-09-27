@@ -15,7 +15,7 @@ export class Badbadconnection
     c_event!: connection_event
     sending_package_md5!: string
     send_finish_callback?: () => void
-    package_data_length = 6
+    package_data_length = 1300
     package_container: Package_helper
 
     /**
@@ -129,7 +129,7 @@ export class Badbadconnection
     async send(msg:string)
     {
         let msg_for_send = this.try_encode(msg)
-        await Package_helper.package_string_making_loop(msg_for_send, 13, async (package_string:string , package_md5: string) =>
+        await Package_helper.package_string_making_loop(msg_for_send, this.package_data_length, async (package_string:string , package_md5: string) =>
         {
             await this.send_package(package_md5, package_string)
         })

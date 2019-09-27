@@ -93,9 +93,24 @@ describe("Badbadconnection", function ()
         //     should(b2_recv).equal(b1_send)
         // })
 
+        function get_random_big_msg(max_msg_length: number)
+        {
+            let big_msg: string
+            big_msg = ""
+            for(;;)
+            {
+                big_msg += String(Math.random()*10e3)
+                if(big_msg.length > max_msg_length)
+                {
+                    break
+                }
+            }
+            return big_msg
+        }
+
         it("大数据发送", () =>
         {
-            let long_text = "cdjklxbdsjklfgilhqwegbicxfaskdlnmhasgdk,xmihnbrhvbegaeycbdhasbyeuaghlcmnashmeckabnsecaegfashcbvfeasghevfcgda"
+            let long_text = get_random_big_msg(10 * 1024)
             return new Promise(async succ =>
             {
                 b2.on_recv((msg: string) =>
