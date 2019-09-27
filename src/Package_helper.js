@@ -23,6 +23,9 @@ function quick_random_md5() {
 }
 exports.quick_random_md5 = quick_random_md5;
 class Data_package {
+    is_endding_package() {
+        return (this.current_index + this.package_data.length) >= this.total_length;
+    }
 }
 exports.Data_package = Data_package;
 class Message_data {

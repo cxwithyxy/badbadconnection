@@ -21,6 +21,11 @@ export class Data_package
     total_length?: number
     current_index?: number
     package_data?: string
+    
+    is_endding_package()
+    {
+        return (<number>this.current_index + (<string>this.package_data).length) >= <number>this.total_length
+    }
 }
 
 export class Message_data

@@ -251,6 +251,25 @@ describe("Package_helper内各种内容测试", function ()
         })
     })
 
+    describe("# Data_package instance function", () =>
+    {
+        it("- is_endding_package", () =>
+        {
+            let p_md5 = "qwerqwerqwerqwerqwerqwerqwerqwer"
+            let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let total = "0000000000200"
+            let current = "0000000000184"
+            let data = "datadatadatadata"
+            let test_package_string = [p_md5, msgmd5, total, current, data].join("")
+            let test_data_package = Package_helper.parse_data_package(test_package_string)
+            should(test_data_package.is_endding_package()).true()
+            current = "0000000000180"
+            test_package_string = [p_md5, msgmd5, total, current, data].join("")
+            test_data_package = Package_helper.parse_data_package(test_package_string)
+            should(test_data_package.is_endding_package()).false()
+        })
+    })
+
     describe("# Package_helper instance function", () =>
     {
         it("- find_message_data_index", () =>

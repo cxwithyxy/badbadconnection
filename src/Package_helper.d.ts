@@ -11,6 +11,7 @@ export declare class Data_package {
     total_length?: number;
     current_index?: number;
     package_data?: string;
+    is_endding_package(): boolean;
 }
 export declare class Message_data {
     msg_md5: string;
