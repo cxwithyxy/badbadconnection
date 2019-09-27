@@ -1,3 +1,5 @@
+/// <reference types="node" />
+import { EventEmitter } from "events";
 export declare class DATA_PACKAGE_AREADY_EXISTS extends Error {
 }
 export declare class DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA extends Error {
@@ -27,7 +29,10 @@ export declare class Message_data {
     find_data_package_index(package_md5: string): number;
     add_data_package(dp: Data_package): void;
 }
-export declare class Package_helper {
+export interface Package_helper {
+    on(event: "message_finish", listener: (message_data: Message_data) => void): this;
+}
+export declare class Package_helper extends EventEmitter {
     message_data_list: Message_data[];
     constructor();
     find_message_data_index(msg_md5: string): number;

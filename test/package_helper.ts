@@ -5,6 +5,21 @@ import { isUndefined } from "util";
 
 describe("Package_helper内各种内容测试", function ()
 {
+    function get_random_big_msg(max_msg_length: number)
+    {
+        let big_msg: string
+        big_msg = ""
+        for(;;)
+        {
+            big_msg += String(Math.random()*10e3)
+            if(big_msg.length > max_msg_length)
+            {
+                break
+            }
+        }
+        return big_msg
+    }
+
     it("- quick_random_md5", () =>
     {
         let random_md5_list = []
@@ -77,17 +92,8 @@ describe("Package_helper内各种内容测试", function ()
 
         it("- package_string_making_loop", async () =>
         {
-            let max_msg_length = 1000
-            let big_msg: string
-            big_msg = ""
-            for(;;)
-            {
-                big_msg += String(Math.random()*10e3)
-                if(big_msg.length > max_msg_length)
-                {
-                    break
-                }
-            }
+            let max_msg_length = 991
+            let big_msg: string = get_random_big_msg(max_msg_length)
             await Package_helper.package_string_making_loop(
                 big_msg,
                 200,
@@ -189,16 +195,7 @@ describe("Package_helper内各种内容测试", function ()
         {
             let message_data!: Message_data
             let max_msg_length = 999
-            let big_msg: string
-            big_msg = ""
-            for(;;)
-            {
-                big_msg += String(Math.random()*10e3)
-                if(big_msg.length > max_msg_length)
-                {
-                    break
-                }
-            }
+            let big_msg: string = get_random_big_msg(max_msg_length)
             await Package_helper.package_string_making_loop(
                 big_msg,
                 193,
@@ -220,16 +217,7 @@ describe("Package_helper内各种内容测试", function ()
         {
             let message_data!: Message_data
             let max_msg_length = 999
-            let big_msg: string
-            big_msg = ""
-            for(;;)
-            {
-                big_msg += String(Math.random()*10e3)
-                if(big_msg.length > max_msg_length)
-                {
-                    break
-                }
-            }
+            let big_msg: string = get_random_big_msg(max_msg_length)
             await Package_helper.package_string_making_loop(
                 big_msg,
                 193,
@@ -272,9 +260,14 @@ describe("Package_helper内各种内容测试", function ()
 
     describe("# Package_helper instance function", () =>
     {
+        let ph !: Package_helper
+        beforeEach(() => 
+        {
+            ph = new Package_helper()
+        })
+
         it("- find_message_data_index", () =>
         {
-            let ph = new Package_helper()
             let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
             let wrong_msgmd5 = "ghjkghjkghjkghjkghjkghjkghjkghjk"
             ph.message_data_list = [new Message_data(msgmd5)]
@@ -286,7 +279,6 @@ describe("Package_helper内各种内容测试", function ()
 
         it("- setup_message_data", () =>
         {
-            let ph = new Package_helper()
             let msgmd5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
             let message_data = ph.setup_message_data(msgmd5)
             should(message_data.msg_md5).equal(msgmd5)
@@ -296,18 +288,8 @@ describe("Package_helper内各种内容测试", function ()
 
         it("- add_source_str_to_message_data", async () =>
         {
-            let ph = new Package_helper()
             let max_msg_length = 999
-            let big_msg: string
-            big_msg = ""
-            for(;;)
-            {
-                big_msg += String(Math.random()*10e3)
-                if(big_msg.length > max_msg_length)
-                {
-                    break
-                }
-            }
+            let big_msg: string = get_random_big_msg(max_msg_length)
             await Package_helper.package_string_making_loop(
                 big_msg,
                 193,
@@ -318,6 +300,29 @@ describe("Package_helper内各种内容测试", function ()
             )
             let temp_msg = ph.message_data_list[0].get_message_content()
             should(temp_msg).equal(big_msg)
+        })
+
+        it("E message_finish", () =>
+        {
+            let max_msg_length = 999
+            let big_msg: string = get_random_big_msg(max_msg_length)
+            return new Promise(async succ =>
+            {
+                ph.on("message_finish", (message_data: Message_data) =>
+                {
+                    should(message_data.get_message_content()).equal(big_msg)
+                    succ()
+                })
+
+                await Package_helper.package_string_making_loop(
+                    big_msg,
+                    193,
+                    async (package_string:string , package_md5: string) =>
+                    {
+                        ph.add_source_str_to_message_data(package_string)
+                    }
+                )
+            })
         })
     })
 })

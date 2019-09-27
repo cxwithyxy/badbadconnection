@@ -2,6 +2,7 @@ import numeral from "numeral";
 import { Encryption_string } from "./../src/Encryption_string";
 import _ from "lodash";
 import { isUndefined } from "util";
+import { EventEmitter } from "events";
 
 export class DATA_PACKAGE_AREADY_EXISTS extends Error{}
 export class DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA extends Error{}
@@ -122,12 +123,18 @@ export class Message_data
     }
 }
 
-export class Package_helper
+export interface Package_helper
+{
+    on(event: "message_finish", listener: (message_data: Message_data) => void): this
+}
+
+export class Package_helper extends EventEmitter 
 {
     message_data_list: Message_data[]
     
     constructor()
     {
+        super()
         this.message_data_list = []
     }
 
@@ -157,8 +164,11 @@ export class Package_helper
         let data_package = Package_helper.parse_data_package(source_str)
         let message_data = this.setup_message_data(<string>data_package.msg_md5)
         message_data.add_data_package(data_package)
+        if(data_package.is_endding_package())
+        {
+            this.emit("message_finish", message_data)
+        }
     }
-
 
     /**
      * 基于数据包原始数据生成数据包对象

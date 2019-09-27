@@ -7,6 +7,7 @@ const numeral_1 = __importDefault(require("numeral"));
 const Encryption_string_1 = require("./../src/Encryption_string");
 const lodash_1 = __importDefault(require("lodash"));
 const util_1 = require("util");
+const events_1 = require("events");
 class DATA_PACKAGE_AREADY_EXISTS extends Error {
 }
 exports.DATA_PACKAGE_AREADY_EXISTS = DATA_PACKAGE_AREADY_EXISTS;
@@ -93,8 +94,9 @@ class Message_data {
     }
 }
 exports.Message_data = Message_data;
-class Package_helper {
+class Package_helper extends events_1.EventEmitter {
     constructor() {
+        super();
         this.message_data_list = [];
     }
     find_message_data_index(msg_md5) {
@@ -116,6 +118,9 @@ class Package_helper {
         let data_package = Package_helper.parse_data_package(source_str);
         let message_data = this.setup_message_data(data_package.msg_md5);
         message_data.add_data_package(data_package);
+        if (data_package.is_endding_package()) {
+            this.emit("message_finish", message_data);
+        }
     }
     /**
      * 基于数据包原始数据生成数据包对象
