@@ -1,6 +1,7 @@
 import { BrowserWindow, webContents, ipcMain, IpcMainEvent } from "electron";
 import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
+import { Package_helper, Message_data } from "./Package_helper";
 
 export class Badbadconnection
 {
@@ -12,8 +13,10 @@ export class Badbadconnection
     channel: string
     encryption_string: Encryption_string | boolean = false
     c_event!: connection_event
-    sending_msg_md5!: string
-
+    sending_package_md5!: string
+    send_finish_callback?: () => void
+    package_data_length = 1300
+    package_container: Package_helper
 
     /**
      *Creates an instance of Badbadconnection.
@@ -22,7 +25,7 @@ export class Badbadconnection
      */
     constructor(channel: string, encryption: {key: string, counter: number} | boolean = false)
     {
-        this.sending_msg_md5 = ""
+        this.sending_package_md5 = ""
         this.event_name_init()
         if(encryption)
         {
@@ -41,6 +44,7 @@ export class Badbadconnection
         })
         this.wincc = this.win.webContents
         this.on_resv_func = (msg: string) => {}
+        this.package_container = new Package_helper()
     }
 
     event_name_init()
@@ -78,10 +82,10 @@ export class Badbadconnection
     async init(): Promise<Badbadconnection>
     {
         await this.win.loadURL(this.url)
-
+        await this.wincc.executeJavaScript(`let main_app`)
         await this.wincc.executeJavaScript(`
             (async () =>{
-                let main_app = new Main_app(
+                main_app = new Main_app(
                     "${this.try_encode(this.channel)}",
                     {
                         main_app_recv: "${this.c_event.main_app_recv}",
@@ -94,14 +98,26 @@ export class Badbadconnection
 
         ipcMain.on(this.c_event.main_app_recv, (e: IpcMainEvent, msg: string) =>
         {
-            let decode_msg = this.try_decode(msg)
-            let msg_md5 = decode_msg.substring(0, 32)
-            if(msg_md5 != this.sending_msg_md5)
+            let package_md5 = Package_helper.parse_package_string(msg, "md5")
+            if(package_md5 == this.sending_package_md5)
             {
-                let recv_msg = decode_msg.substring(32)
-                this.on_resv_func(recv_msg)
+                if(this.send_finish_callback)
+                {
+                    this.send_finish_callback()
+                    this.send_finish_callback = undefined
+                }
+            }
+            else
+            {
+                this.package_container.add_source_str_to_message_data(msg)
             }
         })
+
+        this.package_container.on("message_finish", (m_d: Message_data) =>
+        {
+            this.on_resv_func(this.try_decode(m_d.get_message_content()))
+        })
+
         return this
     }
 
@@ -112,11 +128,24 @@ export class Badbadconnection
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg: string)
+
+    async send(msg:string)
     {
-        this.sending_msg_md5 = this.build_sending_msg_md5()
-        msg = this.sending_msg_md5 + msg
-        this.wincc.send(this.c_event.main_app_send, this.try_encode(msg))
+        let msg_for_send = this.try_encode(msg)
+        await Package_helper.package_string_making_loop(msg_for_send, this.package_data_length, async (package_string:string , package_md5: string) =>
+        {
+            await this.send_package(package_md5, package_string)
+        })
+    }
+
+    async send_package(package_md5: string, package_data: string )
+    {
+        return new Promise(succ =>
+        {
+            this.send_finish_callback = succ
+            this.sending_package_md5 = package_md5
+            this.wincc.send(this.c_event.main_app_send, package_data)
+        })
     }
 
 
@@ -131,15 +160,9 @@ export class Badbadconnection
         this.on_resv_func = _func
     }
 
-    build_sending_msg_md5(): string
+    async close()
     {
-        let msg_md5: string
-        msg_md5 = Encryption_string.get_md5(String(Math.random()))
-        return msg_md5
-    }
-
-    close()
-    {
+        await this.wincc.executeJavaScript(`main_app.close()`)
         this.win.close()
     }
 

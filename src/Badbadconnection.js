@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const Encryption_string_1 = require("./Encryption_string");
+const Package_helper_1 = require("./Package_helper");
 class Badbadconnection {
     /**
      *Creates an instance of Badbadconnection.
@@ -11,7 +12,8 @@ class Badbadconnection {
     constructor(channel, encryption = false) {
         this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
         this.encryption_string = false;
-        this.sending_msg_md5 = "";
+        this.package_data_length = 1300;
+        this.sending_package_md5 = "";
         this.event_name_init();
         if (encryption) {
             let encryption2 = encryption;
@@ -29,6 +31,7 @@ class Badbadconnection {
         });
         this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
+        this.package_container = new Package_helper_1.Package_helper();
     }
     event_name_init() {
         this.c_event = {
@@ -56,9 +59,10 @@ class Badbadconnection {
      */
     async init() {
         await this.win.loadURL(this.url);
+        await this.wincc.executeJavaScript(`let main_app`);
         await this.wincc.executeJavaScript(`
             (async () =>{
-                let main_app = new Main_app(
+                main_app = new Main_app(
                     "${this.try_encode(this.channel)}",
                     {
                         main_app_recv: "${this.c_event.main_app_recv}",
@@ -69,12 +73,19 @@ class Badbadconnection {
             })()
         `);
         electron_1.ipcMain.on(this.c_event.main_app_recv, (e, msg) => {
-            let decode_msg = this.try_decode(msg);
-            let msg_md5 = decode_msg.substring(0, 32);
-            if (msg_md5 != this.sending_msg_md5) {
-                let recv_msg = decode_msg.substring(32);
-                this.on_resv_func(recv_msg);
+            let package_md5 = Package_helper_1.Package_helper.parse_package_string(msg, "md5");
+            if (package_md5 == this.sending_package_md5) {
+                if (this.send_finish_callback) {
+                    this.send_finish_callback();
+                    this.send_finish_callback = undefined;
+                }
             }
+            else {
+                this.package_container.add_source_str_to_message_data(msg);
+            }
+        });
+        this.package_container.on("message_finish", (m_d) => {
+            this.on_resv_func(this.try_decode(m_d.get_message_content()));
         });
         return this;
     }
@@ -84,10 +95,18 @@ class Badbadconnection {
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg) {
-        this.sending_msg_md5 = this.build_sending_msg_md5();
-        msg = this.sending_msg_md5 + msg;
-        this.wincc.send(this.c_event.main_app_send, this.try_encode(msg));
+    async send(msg) {
+        let msg_for_send = this.try_encode(msg);
+        await Package_helper_1.Package_helper.package_string_making_loop(msg_for_send, this.package_data_length, async (package_string, package_md5) => {
+            await this.send_package(package_md5, package_string);
+        });
+    }
+    async send_package(package_md5, package_data) {
+        return new Promise(succ => {
+            this.send_finish_callback = succ;
+            this.sending_package_md5 = package_md5;
+            this.wincc.send(this.c_event.main_app_send, package_data);
+        });
     }
     /**
      * 设置接受消息的回调函数
@@ -98,12 +117,8 @@ class Badbadconnection {
     on_recv(_func) {
         this.on_resv_func = _func;
     }
-    build_sending_msg_md5() {
-        let msg_md5;
-        msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
-        return msg_md5;
-    }
-    close() {
+    async close() {
+        await this.wincc.executeJavaScript(`main_app.close()`);
         this.win.close();
     }
 }

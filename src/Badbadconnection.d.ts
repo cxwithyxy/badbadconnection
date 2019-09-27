@@ -1,6 +1,7 @@
 import { BrowserWindow, webContents } from "electron";
 import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
+import { Package_helper } from "./Package_helper";
 export declare class Badbadconnection {
     url: string;
     win: BrowserWindow;
@@ -9,7 +10,10 @@ export declare class Badbadconnection {
     channel: string;
     encryption_string: Encryption_string | boolean;
     c_event: connection_event;
-    sending_msg_md5: string;
+    sending_package_md5: string;
+    send_finish_callback?: () => void;
+    package_data_length: number;
+    package_container: Package_helper;
     /**
      *Creates an instance of Badbadconnection.
      * @param {string} channel 频道名称, 反正是个字符串, 什么都可以
@@ -35,7 +39,8 @@ export declare class Badbadconnection {
      * @param {string} msg
      * @memberof Badbadconnection
      */
-    send(msg: string): void;
+    send(msg: string): Promise<void>;
+    send_package(package_md5: string, package_data: string): Promise<unknown>;
     /**
      * 设置接受消息的回调函数
      *
@@ -43,6 +48,5 @@ export declare class Badbadconnection {
      * @memberof Badbadconnection
      */
     on_recv(_func: (msg: string) => void): void;
-    build_sending_msg_md5(): string;
-    close(): void;
+    close(): Promise<void>;
 }
