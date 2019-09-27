@@ -17,6 +17,8 @@ export declare class Message_data {
     data_package_list: Data_package[];
     message_content?: string;
     constructor(msg_md5: string);
+    clean_up(): void;
+    get_message_content(): string;
     find_data_package(filter: {
         sending_package_md5?: string;
         current_index?: number;

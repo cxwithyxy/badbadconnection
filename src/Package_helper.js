@@ -30,6 +30,32 @@ class Message_data {
         this.msg_md5 = msg_md5;
         this.data_package_list = [];
     }
+    clean_up() {
+        delete this.message_content;
+    }
+    get_message_content() {
+        let current_index = 0;
+        let message_content = "";
+        let temp_data_package;
+        if (!util_1.isUndefined(this.message_content)) {
+            return this.message_content;
+        }
+        for (;;) {
+            try {
+                temp_data_package = this.find_data_package({ current_index: current_index });
+                message_content += temp_data_package.package_data;
+            }
+            catch (e) {
+                if (e instanceof DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA) {
+                    this.message_content = message_content;
+                    return message_content;
+                    break;
+                }
+                throw e;
+            }
+            current_index = message_content.length;
+        }
+    }
     find_data_package(filter) {
         let index = lodash_1.default.findIndex(this.data_package_list, data_package => {
             if (!util_1.isUndefined(filter.sending_package_md5) && !util_1.isUndefined(filter.current_index)) {

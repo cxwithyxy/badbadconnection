@@ -35,6 +35,41 @@ export class Message_data
         this.data_package_list = []
     }
 
+    clean_up()
+    {
+        delete this.message_content
+    }
+
+    get_message_content(): string
+    {
+        let current_index = 0
+        let message_content = ""
+        let temp_data_package
+        if(!isUndefined(this.message_content))
+        {
+            return this.message_content
+        }
+        for(;;)
+        {
+            try
+            {
+                temp_data_package = this.find_data_package({current_index: current_index})
+                message_content += temp_data_package.package_data
+            }
+            catch(e)
+            {
+                if(e instanceof DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA)
+                {
+                    this.message_content = message_content
+                    return message_content
+                    break
+                }
+                throw e
+            }
+            current_index = message_content.length
+        }
+    }
+
     find_data_package(filter: {sending_package_md5?: string, current_index?: number}): Data_package
     {
         let index = _.findIndex(this.data_package_list, data_package =>

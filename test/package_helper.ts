@@ -1,6 +1,7 @@
 import { Package_helper, Message_data, quick_random_md5, Data_package, DATA_PACKAGE_AREADY_EXISTS, DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA, ARGUMENTS_MISS} from "./../src/Package_helper";
 import should from "should";
 import _ from "lodash";
+import { isUndefined } from "util";
 
 describe("Package_helper内各种内容测试", function ()
 {
@@ -182,6 +183,71 @@ describe("Package_helper内各种内容测试", function ()
             {
                 should(e instanceof DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA).equal(true)
             }
+        })
+
+        it("- get_message_content", async () =>
+        {
+            let message_data!: Message_data
+            let max_msg_length = 999
+            let big_msg: string
+            big_msg = ""
+            for(;;)
+            {
+                big_msg += String(Math.random()*10e3)
+                if(big_msg.length > max_msg_length)
+                {
+                    break
+                }
+            }
+            await Package_helper.package_string_making_loop(
+                big_msg,
+                193,
+                async (package_string:string , package_md5: string) =>
+                {
+                    let data_package = Package_helper.parse_data_package(package_string)
+                    if(isUndefined(message_data))
+                    {
+                        message_data = new Message_data(<string>data_package.msg_md5)
+                    }
+                    message_data.add_data_package(data_package)
+                }
+            )
+            let recv_message = message_data.get_message_content()
+            should(recv_message).equal(big_msg)
+        })
+
+        it("- clean_up", async () =>
+        {
+            let message_data!: Message_data
+            let max_msg_length = 999
+            let big_msg: string
+            big_msg = ""
+            for(;;)
+            {
+                big_msg += String(Math.random()*10e3)
+                if(big_msg.length > max_msg_length)
+                {
+                    break
+                }
+            }
+            await Package_helper.package_string_making_loop(
+                big_msg,
+                193,
+                async (package_string:string , package_md5: string) =>
+                {
+                    let data_package = Package_helper.parse_data_package(package_string)
+                    if(isUndefined(message_data))
+                    {
+                        message_data = new Message_data(<string>data_package.msg_md5)
+                    }
+                    message_data.add_data_package(data_package)
+                }
+            )
+            should(message_data.message_content).undefined()
+            let recv_message = message_data.get_message_content()
+            should(recv_message).equal(message_data.message_content)
+            message_data.clean_up()
+            should(message_data.message_content).undefined()
         })
     })
 
