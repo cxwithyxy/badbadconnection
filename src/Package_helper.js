@@ -6,9 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const numeral_1 = __importDefault(require("numeral"));
 const Encryption_string_1 = require("./../src/Encryption_string");
 const lodash_1 = __importDefault(require("lodash"));
+const util_1 = require("util");
 class DATA_PACKAGE_AREADY_EXISTS extends Error {
 }
 exports.DATA_PACKAGE_AREADY_EXISTS = DATA_PACKAGE_AREADY_EXISTS;
+class DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA extends Error {
+}
+exports.DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA = DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA;
+class ARGUMENTS_MISS extends Error {
+}
+exports.ARGUMENTS_MISS = ARGUMENTS_MISS;
 function quick_random_md5() {
     let msg_md5;
     msg_md5 = Encryption_string_1.Encryption_string.get_md5(String(Math.random()));
@@ -22,6 +29,26 @@ class Message_data {
     constructor(msg_md5) {
         this.msg_md5 = msg_md5;
         this.data_package_list = [];
+    }
+    find_data_package(filter) {
+        let index = lodash_1.default.findIndex(this.data_package_list, data_package => {
+            if (!util_1.isUndefined(filter.sending_package_md5) && !util_1.isUndefined(filter.current_index)) {
+                return data_package.sending_package_md5 == filter.sending_package_md5 && data_package.current_index == filter.current_index;
+            }
+            else if (!util_1.isUndefined(filter.sending_package_md5)) {
+                return data_package.sending_package_md5 == filter.sending_package_md5;
+            }
+            else if (!util_1.isUndefined(filter.current_index)) {
+                return data_package.current_index == filter.current_index;
+            }
+            else {
+                throw new ARGUMENTS_MISS(`filter: ${filter}`);
+            }
+        });
+        if (index == -1) {
+            throw new DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA();
+        }
+        return this.data_package_list[index];
     }
     find_data_package_index(package_md5) {
         let index = lodash_1.default.findIndex(this.data_package_list, data_package => {

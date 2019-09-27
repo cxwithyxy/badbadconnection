@@ -1,8 +1,11 @@
 import numeral from "numeral";
 import { Encryption_string } from "./../src/Encryption_string";
 import _ from "lodash";
+import { isUndefined } from "util";
 
 export class DATA_PACKAGE_AREADY_EXISTS extends Error{}
+export class DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA extends Error{}
+export class ARGUMENTS_MISS extends Error{}
 
 export function quick_random_md5(): string
 {
@@ -34,7 +37,30 @@ export class Message_data
 
     find_data_package(filter: {sending_package_md5?: string, current_index?: number}): Data_package
     {
-        
+        let index = _.findIndex(this.data_package_list, data_package =>
+        {
+            if(!isUndefined(filter.sending_package_md5) && !isUndefined(filter.current_index))
+            {
+                return data_package.sending_package_md5 == filter.sending_package_md5 && data_package.current_index == filter.current_index
+            }
+            else if(!isUndefined(filter.sending_package_md5))
+            {
+                return data_package.sending_package_md5 == filter.sending_package_md5
+            }
+            else if(!isUndefined(filter.current_index))
+            {
+                return data_package.current_index == filter.current_index
+            }
+            else
+            {
+                throw new ARGUMENTS_MISS(`filter: ${filter}`)
+            }
+        })
+        if(index == -1)
+        {
+            throw new DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA()
+        }
+        return this.data_package_list[index]
     }
 
     find_data_package_index(package_md5: string)

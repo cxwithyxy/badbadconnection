@@ -1,4 +1,4 @@
-import { Package_helper, Message_data, quick_random_md5, Data_package, DATA_PACKAGE_AREADY_EXISTS } from "./../src/Package_helper";
+import { Package_helper, Message_data, quick_random_md5, Data_package, DATA_PACKAGE_AREADY_EXISTS, DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA, ARGUMENTS_MISS} from "./../src/Package_helper";
 import should from "should";
 import _ from "lodash";
 
@@ -147,6 +147,40 @@ describe("Package_helper内各种内容测试", function ()
             catch(e)
             {
                 should(e instanceof DATA_PACKAGE_AREADY_EXISTS).equal(true)
+            }
+        })
+
+        it("- find_data_package", () =>
+        {
+            let data_package = new Data_package()
+            data_package.sending_package_md5 = "qwerqwerqwerqwerqwerqwerqwerqwer"
+            data_package.msg_md5 = "asdfasdfasdfasdfasdfasdfasdfasdf"
+            let total = "0000000000200"
+            data_package.total_length = 200
+            let current = "0000000000120"
+            data_package.current_index = 120
+            data_package.package_data = "datadatadatadata"
+            let message_data = new Message_data(data_package.msg_md5)
+            message_data.add_data_package(data_package)
+            let temp_data_package = message_data.find_data_package({sending_package_md5: data_package.sending_package_md5})
+            should(data_package).equal(temp_data_package)
+            temp_data_package = message_data.find_data_package({current_index: data_package.current_index})
+            should(data_package).equal(temp_data_package)
+            try
+            {
+                message_data.find_data_package({})
+            }
+            catch(e)
+            {
+                should(e instanceof ARGUMENTS_MISS).equal(true)
+            }
+            try
+            {
+                message_data.find_data_package({sending_package_md5: "????????????????????????????????"})
+            }
+            catch(e)
+            {
+                should(e instanceof DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA).equal(true)
             }
         })
     })

@@ -1,5 +1,9 @@
 export declare class DATA_PACKAGE_AREADY_EXISTS extends Error {
 }
+export declare class DATA_PACKAGE_NOT_FOUND_IN_MESSAGE_DATA extends Error {
+}
+export declare class ARGUMENTS_MISS extends Error {
+}
 export declare function quick_random_md5(): string;
 export declare class Data_package {
     sending_package_md5?: string;
@@ -13,6 +17,10 @@ export declare class Message_data {
     data_package_list: Data_package[];
     message_content?: string;
     constructor(msg_md5: string);
+    find_data_package(filter: {
+        sending_package_md5?: string;
+        current_index?: number;
+    }): Data_package;
     find_data_package_index(package_md5: string): number;
     add_data_package(dp: Data_package): void;
 }
