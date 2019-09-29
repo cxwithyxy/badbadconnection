@@ -34,5 +34,18 @@ class Main_app {
             });
         });
     }
+    async close() {
+        return new Promise((succ, fail) => {
+            this.get_goeasy().unsubscribe({
+                channel: this.channel,
+                onSuccess: function () {
+                    succ();
+                },
+                onFailed: function (error) {
+                    fail(error.content);
+                }
+            });
+        });
+    }
 }
 global.Main_app = Main_app;
