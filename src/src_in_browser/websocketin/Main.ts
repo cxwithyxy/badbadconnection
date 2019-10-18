@@ -17,6 +17,7 @@ class Main_app
     send(msg: string)
     {
         this.ws.send(msg)
+        ipcRenderer.send(this.c_event.main_app_recv, msg) // 这里要模拟goeasy中发送方依旧收到自己的信息的情形, 不然要改很多逻辑了
     }
 
     async ipc_init()

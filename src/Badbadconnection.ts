@@ -94,10 +94,10 @@ export class Badbadconnection
         this.win = new BrowserWindow({
             width: 400,
             height: 200,
-            // show: false,
+            show: false,
             webPreferences: {
                 preload: connection_setting.script,
-                // offscreen: true
+                offscreen: true
             }
         })
         this.wincc = this.win.webContents

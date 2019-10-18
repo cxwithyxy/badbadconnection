@@ -69,9 +69,10 @@ class Badbadconnection {
         this.win = new electron_1.BrowserWindow({
             width: 400,
             height: 200,
-            // show: false,
+            show: false,
             webPreferences: {
                 preload: connection_setting.script,
+                offscreen: true
             }
         });
         this.wincc = this.win.webContents;
