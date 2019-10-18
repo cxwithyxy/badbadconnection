@@ -1,4 +1,4 @@
-import { Badbadconnection } from "../index";
+import { Badbadconnection } from "../../index";
 import sleep from "sleep-promise";
 import { BrowserWindow} from "electron";
 import should from "should";
