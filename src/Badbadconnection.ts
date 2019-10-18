@@ -38,7 +38,7 @@ export class Badbadconnection
             height: 200,
             show: false,
             webPreferences: {
-                preload: `${__dirname}/src_in_browser/Main.js`,
+                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
                 offscreen: true
             }
         })

@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { connection_event } from "./../connection_event";
+import { connection_event } from "../../connection_event";
 
 class Main_app
 {
