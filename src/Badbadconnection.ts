@@ -53,6 +53,7 @@ export class Badbadconnection
             throw Error(`connection not found ! max conection index is ${this.connection_setting.length - 1}`)
         }
         this.current_connection_setting = index
+        return this
     }
 
     event_name_init()
@@ -93,10 +94,10 @@ export class Badbadconnection
         this.win = new BrowserWindow({
             width: 400,
             height: 200,
-            show: false,
+            // show: false,
             webPreferences: {
                 preload: connection_setting.script,
-                offscreen: true
+                // offscreen: true
             }
         })
         this.wincc = this.win.webContents

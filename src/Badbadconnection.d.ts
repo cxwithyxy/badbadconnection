@@ -27,7 +27,7 @@ export declare class Badbadconnection {
         key: string;
         counter: number;
     } | boolean);
-    select_connection(index: number): void;
+    select_connection(index: number): this;
     event_name_init(): void;
     try_encode(str: string): string;
     try_decode(str: string): string;

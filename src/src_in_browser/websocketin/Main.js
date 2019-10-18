@@ -6,45 +6,29 @@ class Main_app {
         this.channel = channel;
         this.c_event = c_event;
     }
-    get_goeasy() {
-        return eval("goeasy");
-    }
     send(msg) {
-        this.get_goeasy().publish({
-            channel: this.channel,
-            message: msg
-        });
+        this.ws.send(msg);
     }
     async ipc_init() {
         return new Promise((succ, fail) => {
+            this.ws = new WebSocket(`wss://connect.websocket.in/badbadconnection?room_id=${this.channel}`);
+            this.ws.addEventListener("open", () => {
+                succ();
+            });
+            this.ws.addEventListener("message", (event) => {
+                electron_1.ipcRenderer.send(this.c_event.main_app_recv, event.data);
+            });
             electron_1.ipcRenderer.on(this.c_event.main_app_send, (e, msg) => {
                 this.send(msg);
-            });
-            this.get_goeasy().subscribe({
-                channel: this.channel,
-                onMessage: (message) => {
-                    electron_1.ipcRenderer.send(this.c_event.main_app_recv, message.content);
-                },
-                onSuccess: function () {
-                    succ();
-                },
-                onFailed: function (error) {
-                    fail(error.content);
-                }
             });
         });
     }
     async close() {
         return new Promise((succ, fail) => {
-            this.get_goeasy().unsubscribe({
-                channel: this.channel,
-                onSuccess: function () {
-                    succ();
-                },
-                onFailed: function (error) {
-                    fail(error.content);
-                }
+            this.ws.addEventListener("close", () => {
+                succ();
             });
+            this.ws.close();
         });
     }
 }
