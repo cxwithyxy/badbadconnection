@@ -10,7 +10,17 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     constructor(channel, encryption = false) {
-        this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
+        this.connection_setting = [
+            {
+                url: "http://www.goeasy.io/cn/demo/qrcodelogin",
+                script: `${__dirname}/src_in_browser/goeasy/Main.js`
+            },
+            {
+                url: `${__dirname}/src_in_browser/websocketin/index.html`,
+                script: `${__dirname}/src_in_browser/websocketin/Main.js`
+            }
+        ];
+        this.current_connection_setting = 0;
         this.encryption_string = false;
         this.package_data_length = 1300;
         this.sending_package_md5 = "";
@@ -20,18 +30,15 @@ class Badbadconnection {
             this.encryption_string = new Encryption_string_1.Encryption_string(encryption2.key, encryption2.counter);
         }
         this.channel = channel;
-        this.win = new electron_1.BrowserWindow({
-            width: 400,
-            height: 200,
-            show: false,
-            webPreferences: {
-                preload: `${__dirname}/src_in_browser/Main.js`,
-                offscreen: true
-            }
-        });
-        this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
         this.package_container = new Package_helper_1.Package_helper();
+    }
+    select_connection(index) {
+        if (index < 0 || index >= this.connection_setting.length) {
+            throw Error(`connection not found ! max conection index is ${this.connection_setting.length - 1}`);
+        }
+        this.current_connection_setting = index;
+        return this;
     }
     event_name_init() {
         this.c_event = {
@@ -58,7 +65,18 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     async init() {
-        await this.win.loadURL(this.url);
+        let connection_setting = this.connection_setting[this.current_connection_setting];
+        this.win = new electron_1.BrowserWindow({
+            width: 400,
+            height: 200,
+            show: false,
+            webPreferences: {
+                preload: connection_setting.script,
+                offscreen: true
+            }
+        });
+        this.wincc = this.win.webContents;
+        await this.win.loadURL(connection_setting.url);
         await this.wincc.executeJavaScript(`let main_app`);
         await this.wincc.executeJavaScript(`
             (async () =>{

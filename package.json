@@ -18,7 +18,13 @@
   },
   "scripts": {
     "test:base": "tsc && electron-mocha",
-    "test": "yarn test:base test/Encryption_string.js && yarn test:base test/package_helper.js && yarn test:base test/Badbadconnection.js && yarn test:base test/Badbadconnection_encryption.js"
+    "test:common": "yarn test:base test/Encryption_string.js && yarn test:base test/package_helper.js",
+    "test:goeasy-base": "yarn test:base test/goeasy/Badbadconnection.js",
+    "test:goeasy-crypt": "yarn test:base test/goeasy/Badbadconnection_encryption.js",
+    "test:goeasy": "yarn test:goeasy-base && yarn test:goeasy-crypt",
+    "test:websocketin-base": "yarn test:base test/websocketin/Badbadconnection.js",
+    "test:websocketin-crypt": "yarn test:base test/websocketin/Badbadconnection_encryption.js",
+    "test": "yarn test:common && yarn test:goeasy"
   },
   "dependencies": {
     "aes-js": "^3.1.2",

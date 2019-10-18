@@ -3,7 +3,11 @@ import { Encryption_string } from "./Encryption_string";
 import { connection_event } from "./connection_event";
 import { Package_helper } from "./Package_helper";
 export declare class Badbadconnection {
-    url: string;
+    connection_setting: {
+        url: string;
+        script: string;
+    }[];
+    current_connection_setting: number;
     win: BrowserWindow;
     wincc: webContents;
     on_resv_func: (msg: string) => void;
@@ -23,6 +27,7 @@ export declare class Badbadconnection {
         key: string;
         counter: number;
     } | boolean);
+    select_connection(index: number): this;
     event_name_init(): void;
     try_encode(str: string): string;
     try_decode(str: string): string;

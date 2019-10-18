@@ -1,4 +1,4 @@
-import { Badbadconnection } from "../index";
+import { Badbadconnection } from "../../index";
 import sleep from "sleep-promise";
 import should from "should";
 
@@ -15,8 +15,8 @@ describe("Badbadconnection", function ()
     {
         channel = `test${Math.round(Math.random() * 1e6)}`
         test_msg = `test_msg${Math.round(Math.random() * 1e6)}`
-        b1 = await new Badbadconnection(channel).init()
-        b2 = await new Badbadconnection(channel).init()
+        b1 = await new Badbadconnection(channel).select_connection(1).init()
+        b2 = await new Badbadconnection(channel).select_connection(1).init()
     })
 
     afterEach(async () =>
@@ -107,7 +107,7 @@ describe("Badbadconnection", function ()
             }
             return big_msg
         }
-
+        
         it("大数据发送", () =>
         {
             let long_text = get_random_big_msg(10 * 1024)
