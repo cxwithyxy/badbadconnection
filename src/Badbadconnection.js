@@ -20,16 +20,6 @@ class Badbadconnection {
             this.encryption_string = new Encryption_string_1.Encryption_string(encryption2.key, encryption2.counter);
         }
         this.channel = channel;
-        this.win = new electron_1.BrowserWindow({
-            width: 400,
-            height: 200,
-            show: false,
-            webPreferences: {
-                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
-                offscreen: true
-            }
-        });
-        this.wincc = this.win.webContents;
         this.on_resv_func = (msg) => { };
         this.package_container = new Package_helper_1.Package_helper();
     }
@@ -58,6 +48,16 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     async init() {
+        this.win = new electron_1.BrowserWindow({
+            width: 400,
+            height: 200,
+            show: false,
+            webPreferences: {
+                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
+                offscreen: true
+            }
+        });
+        this.wincc = this.win.webContents;
         await this.win.loadURL(this.url);
         await this.wincc.executeJavaScript(`let main_app`);
         await this.wincc.executeJavaScript(`

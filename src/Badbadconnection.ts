@@ -7,8 +7,8 @@ export class Badbadconnection
 {
 
     url = "http://www.goeasy.io/cn/demo/qrcodelogin"
-    win: BrowserWindow
-    wincc: webContents
+    win!: BrowserWindow
+    wincc!: webContents
     on_resv_func: (msg: string) => void
     channel: string
     encryption_string: Encryption_string | boolean = false
@@ -33,16 +33,6 @@ export class Badbadconnection
             this.encryption_string = new Encryption_string(encryption2.key, encryption2.counter)
         }
         this.channel = channel
-        this.win = new BrowserWindow({
-            width: 400,
-            height: 200,
-            show: false,
-            webPreferences: {
-                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
-                offscreen: true
-            }
-        })
-        this.wincc = this.win.webContents
         this.on_resv_func = (msg: string) => {}
         this.package_container = new Package_helper()
     }
@@ -81,6 +71,16 @@ export class Badbadconnection
      */
     async init(): Promise<Badbadconnection>
     {
+        this.win = new BrowserWindow({
+            width: 400,
+            height: 200,
+            show: false,
+            webPreferences: {
+                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
+                offscreen: true
+            }
+        })
+        this.wincc = this.win.webContents
         await this.win.loadURL(this.url)
         await this.wincc.executeJavaScript(`let main_app`)
         await this.wincc.executeJavaScript(`
