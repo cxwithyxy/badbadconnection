@@ -5,10 +5,19 @@ import { Package_helper, Message_data } from "./Package_helper";
 
 export class Badbadconnection
 {
-
-    url = "http://www.goeasy.io/cn/demo/qrcodelogin"
-    win: BrowserWindow
-    wincc: webContents
+    connection_setting = [
+        {
+            url: "http://www.goeasy.io/cn/demo/qrcodelogin",
+            script: `${__dirname}/src_in_browser/goeasy/Main.js`
+        },
+        {
+            url: `${__dirname}/src_in_browser/websocketin/index.html`,
+            script: `${__dirname}/src_in_browser/websocketin/Main.js`
+        }
+    ]
+    current_connection_setting = 0
+    win!: BrowserWindow
+    wincc!: webContents
     on_resv_func: (msg: string) => void
     channel: string
     encryption_string: Encryption_string | boolean = false
@@ -33,18 +42,18 @@ export class Badbadconnection
             this.encryption_string = new Encryption_string(encryption2.key, encryption2.counter)
         }
         this.channel = channel
-        this.win = new BrowserWindow({
-            width: 400,
-            height: 200,
-            show: false,
-            webPreferences: {
-                preload: `${__dirname}/src_in_browser/Main.js`,
-                offscreen: true
-            }
-        })
-        this.wincc = this.win.webContents
         this.on_resv_func = (msg: string) => {}
         this.package_container = new Package_helper()
+    }
+
+    select_connection(index: number)
+    {
+        if(index < 0 || index >= this.connection_setting.length)
+        {
+            throw Error(`connection not found ! max conection index is ${this.connection_setting.length - 1}`)
+        }
+        this.current_connection_setting = index
+        return this
     }
 
     event_name_init()
@@ -81,7 +90,18 @@ export class Badbadconnection
      */
     async init(): Promise<Badbadconnection>
     {
-        await this.win.loadURL(this.url)
+        let connection_setting = this.connection_setting[this.current_connection_setting]
+        this.win = new BrowserWindow({
+            width: 400,
+            height: 200,
+            show: false,
+            webPreferences: {
+                preload: connection_setting.script,
+                offscreen: true
+            }
+        })
+        this.wincc = this.win.webContents
+        await this.win.loadURL(connection_setting.url)
         await this.wincc.executeJavaScript(`let main_app`)
         await this.wincc.executeJavaScript(`
             (async () =>{
