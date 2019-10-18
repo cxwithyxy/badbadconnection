@@ -5,8 +5,17 @@ import { Package_helper, Message_data } from "./Package_helper";
 
 export class Badbadconnection
 {
-
-    url = "http://www.goeasy.io/cn/demo/qrcodelogin"
+    connection_setting = [
+        {
+            url: "http://www.goeasy.io/cn/demo/qrcodelogin",
+            script: `${__dirname}/src_in_browser/goeasy/Main.js`
+        },
+        {
+            url: `${__dirname}/src_in_browser/websocketin/index.html`,
+            script: `${__dirname}/src_in_browser/websocketin/Main.js`
+        }
+    ]
+    current_connection_setting = 0
     win!: BrowserWindow
     wincc!: webContents
     on_resv_func: (msg: string) => void
@@ -35,6 +44,15 @@ export class Badbadconnection
         this.channel = channel
         this.on_resv_func = (msg: string) => {}
         this.package_container = new Package_helper()
+    }
+
+    select_connection(index: number)
+    {
+        if(index < 0 || index >= this.connection_setting.length)
+        {
+            throw Error(`connection not found ! max conection index is ${this.connection_setting.length - 1}`)
+        }
+        this.current_connection_setting = index
     }
 
     event_name_init()
@@ -71,17 +89,18 @@ export class Badbadconnection
      */
     async init(): Promise<Badbadconnection>
     {
+        let connection_setting = this.connection_setting[this.current_connection_setting]
         this.win = new BrowserWindow({
             width: 400,
             height: 200,
             show: false,
             webPreferences: {
-                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
+                preload: connection_setting.script,
                 offscreen: true
             }
         })
         this.wincc = this.win.webContents
-        await this.win.loadURL(this.url)
+        await this.win.loadURL(connection_setting.url)
         await this.wincc.executeJavaScript(`let main_app`)
         await this.wincc.executeJavaScript(`
             (async () =>{

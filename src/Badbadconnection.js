@@ -10,7 +10,17 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     constructor(channel, encryption = false) {
-        this.url = "http://www.goeasy.io/cn/demo/qrcodelogin";
+        this.connection_setting = [
+            {
+                url: "http://www.goeasy.io/cn/demo/qrcodelogin",
+                script: `${__dirname}/src_in_browser/goeasy/Main.js`
+            },
+            {
+                url: `${__dirname}/src_in_browser/websocketin/index.html`,
+                script: `${__dirname}/src_in_browser/websocketin/Main.js`
+            }
+        ];
+        this.current_connection_setting = 0;
         this.encryption_string = false;
         this.package_data_length = 1300;
         this.sending_package_md5 = "";
@@ -22,6 +32,12 @@ class Badbadconnection {
         this.channel = channel;
         this.on_resv_func = (msg) => { };
         this.package_container = new Package_helper_1.Package_helper();
+    }
+    select_connection(index) {
+        if (index < 0 || index >= this.connection_setting.length) {
+            throw Error(`connection not found ! max conection index is ${this.connection_setting.length - 1}`);
+        }
+        this.current_connection_setting = index;
     }
     event_name_init() {
         this.c_event = {
@@ -48,17 +64,18 @@ class Badbadconnection {
      * @memberof Badbadconnection
      */
     async init() {
+        let connection_setting = this.connection_setting[this.current_connection_setting];
         this.win = new electron_1.BrowserWindow({
             width: 400,
             height: 200,
             show: false,
             webPreferences: {
-                preload: `${__dirname}/src_in_browser/goeasy/Main.js`,
+                preload: connection_setting.script,
                 offscreen: true
             }
         });
         this.wincc = this.win.webContents;
-        await this.win.loadURL(this.url);
+        await this.win.loadURL(connection_setting.url);
         await this.wincc.executeJavaScript(`let main_app`);
         await this.wincc.executeJavaScript(`
             (async () =>{
