@@ -4,12 +4,13 @@
 
 ## 版本
 
-> v3.20190929094933
+> v4.20191018203150
 
 #### 历史版本
 
 | 版本              | 特性                                                         |
 | ----------------- | ------------------------------------------------------------ |
+| v4.20191018203150 | 功能 增加websocketin的支持                                   |
 | v3.20190929094933 | 功能 自动分割数据包                                          |
 | v2.20190918142006 | 修复 实例化时没有成功连接websocket的问题<br />修复 自身发送的消息被自身再次接收的问题 |
 | v1.20190917144230 | 修复 一条消息被接收两次的问题                                |
@@ -58,6 +59,16 @@ badbadconnection.send("我是客户端B")
 
 ```typescript
 let badbadconnection = await new Badbadconnection("our_char_room", {key: "我的密码", counter: 7}).init()
+```
+
+###### 切换websocket服务商
+
+现在有两个服务商，[goeasy](http://www.goeasy.io/) 和 [websocketin](https://www.websocket.in) 
+
+在实例化之后，在 init 调用之前，可调用 select_connection 函数进行服务商的切换。传入参数 0 代表使用 goeasy，传入参数 1 代表使用 websocketin。若不调用 select_connection 函数，默认为 0
+
+```typescript
+let badbadconnection = await new Badbadconnection(channel).select_connection(1).init()
 ```
 
 
