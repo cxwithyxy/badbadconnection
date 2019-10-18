@@ -29,29 +29,37 @@ describe("Badbadconnection encryption", function ()
     {
         it("是否能以加密的方式通讯", async () =>
         {
-            await new Promise(async (succ) =>
+            let b1_resv = ""
+            let promise1 = new Promise((succ1) =>
             {
                 badbadconnection_1.on_recv(async (msg: string) =>
                 {
-                    should(msg).equal(test_msg)
-                    let test_recv:string = await browser.webContents.executeJavaScript(`test_recv`)
-                    should(test_recv).not.equal("test")
-                    should(test_recv).not.equal(msg)
-                    succ()
+                    b1_resv = msg
+                    succ1()
                 })
-                await browser.webContents.executeJavaScript(`
-                    test_recv = "test"
+            })
+            let promise2 =  browser.webContents.executeJavaScript(`
+                test_recv = "test";
+                new Promise((succ) =>
+                {
                     goeasy.subscribe({
                         channel:'${badbadconnection_1.try_encode(channel)}',
                         onMessage: function(message)
                         {
                             test_recv = message.content
+                            succ()
                         }
                     });
-                `)
-                badbadconnection_2.send(test_msg)
-                
-            })
+                });
+            `)
+            await sleep(3e3)
+            badbadconnection_2.send(test_msg)
+             
+            await Promise.all([promise1, promise2])
+            should(b1_resv).equal(test_msg)
+            let test_recv:string = await browser.webContents.executeJavaScript(`test_recv`)
+            should(test_recv).not.equal("test")
+            should(test_recv).not.equal(b1_resv)
         })
     })
 })
