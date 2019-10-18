@@ -23,6 +23,7 @@
     "test:goeasy-crypt": "yarn test:base test/goeasy/Badbadconnection_encryption.js",
     "test:goeasy": "yarn test:goeasy-base && yarn test:goeasy-crypt",
     "test:websocketin-base": "yarn test:base test/websocketin/Badbadconnection.js",
+    "test:websocketin-crypt": "yarn test:base test/websocketin/Badbadconnection_encryption.js",
     "test": "yarn test:common && yarn test:goeasy"
   },
   "dependencies": {

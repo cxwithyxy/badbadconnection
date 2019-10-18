@@ -12,7 +12,8 @@ class Main_app {
     }
     async ipc_init() {
         return new Promise((succ, fail) => {
-            this.ws = new WebSocket(`wss://connect.websocket.in/badbadconnection?room_id=${this.channel}`);
+            let wsurl = `wss://connect.websocket.in/badbadconnection?room_id=${this.channel}`;
+            this.ws = new WebSocket(wsurl);
             this.ws.addEventListener("open", () => {
                 succ();
             });
