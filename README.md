@@ -61,6 +61,16 @@ badbadconnection.send("我是客户端B")
 let badbadconnection = await new Badbadconnection("our_char_room", {key: "我的密码", counter: 7}).init()
 ```
 
+###### 切换websocket服务商
+
+现在有两个服务商，[goeasy](http://www.goeasy.io/) 和 [websocketin](https://www.websocket.in) 
+
+在实例化之后，在 init 调用之前，可调用 select_connection 函数进行服务商的切换。传入参数 0 代表使用 goeasy，传入参数 1 代表使用 websocketin。若不调用 select_connection 函数，默认为 0
+
+```typescript
+let badbadconnection = await new Badbadconnection(channel).select_connection(1).init()
+```
+
 
 
 ##  开发
