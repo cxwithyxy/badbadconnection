@@ -4,7 +4,7 @@
 
 ## 版本
 
-> v4.20191018203150
+> v4.20200207110948
 
 #### 历史版本
 
@@ -24,7 +24,7 @@
 #### 安装
 
 ```
-yarn add git+https://github.com/cxwithyxy/badbadconnection.git
+yarn add https://github.com/cxwithyxy/axure_quick_electronjs/releases/download/v4.20200207110948/badbadconnection.tgz
 ```
 
 #### 代码编写
