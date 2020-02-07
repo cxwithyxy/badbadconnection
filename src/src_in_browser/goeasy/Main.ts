@@ -27,13 +27,26 @@ class Main_app
 
     async ipc_init()
     {
-        return new Promise((succ, fail) =>
+        return new Promise(async (succ, fail) =>
         {
             ipcRenderer.on(this.c_event.main_app_send, (e, msg) =>
             {
                 this.send(msg)
             })
-
+            eval("loadDemo('scanLogin')")
+            await new Promise(succ2 => 
+            {
+                let t_out = setInterval(() =>
+                {
+                    try
+                    {
+                        this.get_goeasy()
+                        clearInterval(t_out)
+                        succ2()
+                    }
+                    catch(e){}
+                }, 1e3)
+            })
             this.get_goeasy().subscribe({
                 channel: this.channel,
                 onMessage: (message:{content:string}) =>
