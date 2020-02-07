@@ -12,7 +12,7 @@ class Badbadconnection {
     constructor(channel, encryption = false) {
         this.connection_setting = [
             {
-                url: "http://www.goeasy.io/cn/demo/qrcodelogin",
+                url: "https://www.goeasy.io/cn/demos/demos.html",
                 script: `${__dirname}/src_in_browser/goeasy/Main.js`
             },
             {

@@ -20,7 +20,21 @@ describe("Badbadconnection encryption", function ()
             width: 400,
             height: 200
         })
-        await browser.loadURL("http://www.goeasy.io/cn/demo/chat")
+        await browser.loadURL("https://www.goeasy.io/cn/demos/demos.html")
+        browser.webContents.executeJavaScript(`loadDemo('scanLogin')`)
+        await new Promise(succ2 => 
+        {
+            let t_out = setInterval(() =>
+            {
+                try
+                {
+                    browser.webContents.executeJavaScript("goeasy")
+                    clearInterval(t_out)
+                    succ2()
+                }
+                catch(e){}
+            }, 1e3)
+        })
         badbadconnection_1 = await new Badbadconnection(channel, {key: key, counter:counter}).init()
         badbadconnection_2 = await new Badbadconnection(channel, {key: key, counter:counter}).init()
     })
