@@ -1,7 +1,7 @@
 {
   "name": "badbadconnection",
   "version": "4.20200207102840.0",
-  "main": "index.js",
+  "main": "build/index.js",
   "repository": "https://github.com/cxwithyxy/badbadconnection.git",
   "author": "cx2889 <cxwithyxy@gmail.com>",
   "license": "MIT",
@@ -11,30 +11,29 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.2",
     "@types/numeral": "^0.0.26",
+    "del-cli": "^3.0.0",
     "electron": "^6.0.2",
     "electron-mocha": "^8.1.1",
+    "make-dir-cli": "^2.0.0",
     "should": "^13.2.3",
     "typescript": "^3.5.3"
   },
   "scripts": {
     "test:base": "tsc && electron-mocha",
-    "test:common": "yarn test:base test/Encryption_string.js && yarn test:base test/package_helper.js",
-    
-    "test:goeasy-base": "yarn test:base test/goeasy/Badbadconnection.js",
-    "test:goeasy-crypt": "yarn test:base test/goeasy/Badbadconnection_encryption.js",
+    "test:common": "yarn test:base build/test/Encryption_string.js && yarn test:base build/test/package_helper.js",
+    "test:goeasy-base": "yarn test:base build/test/goeasy/Badbadconnection.js",
+    "test:goeasy-crypt": "yarn test:base build/test/goeasy/Badbadconnection_encryption.js",
     "test:goeasy": "yarn test:goeasy-base && yarn test:goeasy-crypt",
-    
-    "test:websocketin-base": "yarn test:base test/websocketin/Badbadconnection.js",
-    "test:websocketin-crypt": "yarn test:base test/websocketin/Badbadconnection_encryption.js",
+    "test:websocketin-base": "yarn test:base build/test/websocketin/Badbadconnection.js",
+    "test:websocketin-crypt": "yarn test:base build/test/websocketin/Badbadconnection_encryption.js",
     "test:websocketin": "yarn test:websocketin-base && yarn test:websocketin-crypt",
-    
-    "test": "yarn test:common && yarn test:goeasy && yarn test:websocketin"
+    "test": "yarn test:common && yarn test:goeasy && yarn test:websocketin",
+    "npm_pack": "yarn del build & yarn tsc -d && for /F %i in ('npm pack') do ( yarn make-dir ./dist && move %i ./dist/badbadconnection.tgz)"
   },
   "dependencies": {
     "aes-js": "^3.1.2",
     "lodash": "^4.17.15",
     "md5.js": "^1.3.5",
-    "node-zopfli": "^2.0.3",
     "numeral": "^2.0.6",
     "sleep-promise": "^8.0.1"
   }
